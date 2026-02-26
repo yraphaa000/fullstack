@@ -1,0 +1,117 @@
+.container{
+    display: flex;
+    width: auto;
+    height: 100px;
+    background-color:bisque ;
+    margin-left: auto;
+    margin-right: auto;
+    border: solid 3px darkblue;
+    justify-content: center;
+    
+}
+.titulo{
+    color: darkgreen;
+    margin-top: 35px;
+}
+.c{
+    position: absolute;
+    left: 0%;
+}
+
+.java{
+    position: absolute;
+    right: 0%;
+    top: 0%;
+}
+
+.navbar{
+    background-color: lightskyblue;
+    width: auto;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+}
+.teste{
+    padding-top: 5px;
+    height: 10px;;
+    width: 100px;
+    padding-right: 60px;
+    color: darkred;
+}
+.pSans{
+    font-size: 20pt;
+    font-family: sans-serif;
+}
+
+body{
+    background-color: lightgray;
+    justify-self: center;
+    text-align: center;
+}
+p{
+    color: indigo;
+}
+.livros{
+    position: relative;
+    padding: 20px;
+    
+}
+.iframes{
+    position: relative;
+    padding: 20px;
+    
+}
+.tabela{
+    display: flex;
+    
+}
+table {
+    margin: auto;   
+    border: 2px dashed red;
+    
+}
+th, td {
+    padding: 8px 12px;  
+    border: 1px solid red;
+    
+}
+ul{
+    padding: 30px;
+
+}
+.sites{
+    margin: auto;
+    text-align: left;
+    margin-right: 35%;
+    margin-left: 35%;
+    background-color: yellow;
+}
+
+
+.footer{
+    width: auto;
+    height: 100px;
+    background-color:bisque ;
+
+    border-style: 30px solid darkblue;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+}
+.html{
+    position: absolute;
+    left: 10px;
+   
+}
+.css{
+    position: absolute;
+    right: 30px;
+    
+}
+.pComic{
+    font-size: 15pt;
+    /*font-family:*/
+    margin-top: 20px;
+}
