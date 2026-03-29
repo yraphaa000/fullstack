@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material de Consulta — Parte 2: Divs Aninhadas & Cards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e0dbd3;
+    --text: #1a1814;
+    --muted: #7a7570;
+    --accent: #2a52be;
+    --accent2: #1a7a5e;
+    --accent3: #b85c00;
+    --layer1: #dbeafe;
+    --layer1t: #1e40af;
+    --layer2: #fef3c7;
+    --layer2t: #92400e;
+    --layer3: #d1fae5;
+    --layer3t: #065f46;
+    --layer4: #fce7f3;
+    --layer4t: #9d174d;
+    --layer5: #ede9fe;
+    --layer5t: #5b21b6;
+    --code-bg: #1e1c18;
+    --code-text: #e8e4dc;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+
+  .container { max-width: 980px; margin: 0 auto; }
+
+  /* HEADER */
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 1.8rem; font-weight: 700; line-height: 1.2; }
+  header h1 span { color: #f7c948; }
+  header p { color: #aaa; font-size: 0.88rem; margin-top: 0.4rem; }
+  .badge-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .badge {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 5px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* SECTION */
+  section { margin-bottom: 2rem; }
+  .section-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-head {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width:8px;height:8px;border-radius:50%; }
+  .dot.blue { background:#3b82f6; }
+  .dot.green{ background:#22c55e; }
+  .dot.amber{ background:#f59e0b; }
+  .dot.pink { background:#ec4899; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+  @media(max-width:640px){ .grid2,.grid3{ grid-template-columns:1fr; } }
+
+  /* CODE */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1.1rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.77rem;
+    line-height: 1.85;
+    overflow-x: auto;
+  }
+  .kw  { color:#c792ea; }
+  .at  { color:#80cbc4; }
+  .vl  { color:#f9c859; }
+  .cm  { color:#546e7a; font-style:italic; }
+  .tg  { color:#89ddff; }
+  .se  { color:#f07178; }
+  .pr  { color:#82aaff; }
+  .nu  { color:#f78c6c; }
+  .cl  { color:#ffcb6b; }
+
+  /* LAYER BOXES */
+  .layers-wrap {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .layer {
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    position: relative;
+    margin-bottom: 0;
+  }
+  .layer + .layer { margin-top: -2px; }
+
+  /* RULE TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th {
+    text-align: left; padding: 0.5rem 0.85rem;
+    background: var(--surface2); color: var(--muted);
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    background: var(--surface2);
+    padding: 1px 6px; border-radius: 4px;
+    color: var(--accent);
+  }
+  .muted { color: var(--muted); font-size: 0.78rem; }
+
+  /* PILL */
+  .pill {
+    display: inline-block; font-size: 0.67rem; font-weight: 700;
+    padding: 2px 9px; border-radius: 100px; letter-spacing: 0.04em;
+  }
+  .pill.l1 { background: var(--layer1); color: var(--layer1t); }
+  .pill.l2 { background: var(--layer2); color: var(--layer2t); }
+  .pill.l3 { background: var(--layer3); color: var(--layer3t); }
+  .pill.l4 { background: var(--layer4); color: var(--layer4t); }
+  .pill.l5 { background: var(--layer5); color: var(--layer5t); }
+  .pill.ok { background: #d1fae5; color: #065f46; }
+  .pill.no { background: #fee2e2; color: #991b1b; }
+
+  /* TIP */
+  .tip {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem; color: #78350f;
+    margin-top: 0.75rem;
+  }
+  .tip strong { color: #92400e; }
+
+  /* LIVE DEMO */
+  .demo-news {
+    padding: 1.25rem;
+    background: var(--surface2);
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+  }
+  @media(max-width:600px){ .demo-news{ grid-template-columns:1fr; } }
+  .news-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .news-img {
+    height: 90px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: #999;
+  }
+  .news-body { padding: 0.75rem; }
+  .news-tag {
+    display: inline-block;
+    font-size: 0.65rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+    margin-bottom: 0.4rem;
+  }
+  .news-title { font-size: 0.82rem; font-weight: 700; line-height: 1.35; margin-bottom: 0.3rem; color: #111; }
+  .news-desc  { font-size: 0.72rem; color: #777; line-height: 1.4; margin-bottom: 0.5rem; }
+  .news-footer {
+    display: flex; justify-content: space-between;
+    font-size: 0.65rem; color: #aaa;
+    border-top: 1px solid #eee; padding-top: 0.4rem; margin-top: 0.4rem;
+  }
+
+  footer {
+    text-align: center; margin-top: 3rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div>
+      <h1>Parte 2 — <span>Divs Aninhadas</span><br>& Cards</h1>
+      <p>Ciência de Dados & IA · Prova Prática de Full Stack</p>
+    </div>
+    <div class="badge-group">
+      <span class="badge">Camadas</span>
+      <span class="badge">Cards</span>
+      <span class="badge">Grid</span>
+      <span class="badge">Flexbox</span>
+    </div>
+  </header>
+
+  <!-- 1. MENTALIDADE -->
+  <section>
+    <div class="section-label">01 — Como pensar em camadas</div>
+    <div class="card">
+      <div class="card-head"><span class="dot blue"></span> A pergunta certa para cada elemento</div>
+      <div style="padding:1.25rem;">
+        <table>
+          <thead><tr><th>Quando eu vejo na tela…</th><th>Eu crio no código…</th><th>Por quê?</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Um grupo de coisas juntas</td>
+              <td><code>&lt;div class="nome"&gt;</code></td>
+              <td class="muted">A div <strong>agrupa</strong> — ela não exibe conteúdo, só organiza</td>
+            </tr>
+            <tr>
+              <td>Um título</td>
+              <td><code>&lt;h1&gt;</code> a <code>&lt;h6&gt;</code></td>
+              <td class="muted">Tags de texto <strong>exibem</strong> — elas têm conteúdo real</td>
+            </tr>
+            <tr>
+              <td>Um parágrafo de texto</td>
+              <td><code>&lt;p&gt;</code></td>
+              <td class="muted">Conteúdo de texto corrido</td>
+            </tr>
+            <tr>
+              <td>Uma imagem</td>
+              <td><code>&lt;img src="..." alt="..."&gt;</code></td>
+              <td class="muted">Tag vazia — não tem fechamento</td>
+            </tr>
+            <tr>
+              <td>Uma palavra/frase colorida ou em destaque dentro do texto</td>
+              <td><code>&lt;span class="tag"&gt;</code></td>
+              <td class="muted"><code>span</code> é inline — não quebra linha</td>
+            </tr>
+            <tr>
+              <td>Um botão</td>
+              <td><code>&lt;button&gt;</code></td>
+              <td class="muted">Semântico e clicável nativamente</td>
+            </tr>
+            <tr>
+              <td>Um link</td>
+              <td><code>&lt;a href="#"&gt;</code></td>
+              <td class="muted">Sempre com <code>href</code>, mesmo que seja <code>#</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip">
+          <strong>Regra de ouro:</strong> se o elemento <em>agrupa</em> outros elementos → <code>&lt;div&gt;</code>.
+          Se o elemento <em>exibe</em> conteúdo (texto, imagem, botão) → use a tag correta (<code>h1, p, img, span, button</code>).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. AS 5 CAMADAS -->
+  <section>
+    <div class="section-label">02 — As 5 camadas de um card de notícia</div>
+    <div class="grid2">
+
+      <div class="card">
+        <div class="card-head"><span class="dot amber"></span> Estrutura visual (cada cor = uma camada)</div>
+        <div class="layers-wrap">
+          <div class="layer" style="background:var(--layer1);color:var(--layer1t);border-radius:10px 10px 0 0; padding-bottom:0.3rem;">
+            <span class="pill l1">Camada 1</span> &nbsp;.cards-grid — container da grade
+            <div class="layer" style="background:var(--layer2);color:var(--layer2t);margin-top:0.4rem;border-radius:8px 8px 0 0; padding-bottom:0.3rem;">
+              <span class="pill l2">Camada 2</span> &nbsp;.card — cada notícia
+              <div class="layer" style="background:var(--layer3);color:var(--layer3t);margin-top:0.4rem; border-radius:6px;">
+                <span class="pill l3">Camada 3</span> &nbsp;.card-image
+              </div>
+              <div class="layer" style="background:var(--layer4);color:var(--layer4t);margin-top:0.3rem;border-radius:6px 6px 0 0; padding-bottom:0.3rem;">
+                <span class="pill l4">Camada 3</span> &nbsp;.card-body
+                <div class="layer" style="background:var(--layer5);color:var(--layer5t);margin-top:0.4rem; border-radius:5px;">
+                  <span class="pill l5">Camada 4</span> &nbsp;span.tag · h3 · p · .card-footer
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="dot amber"></span> HTML correspondente</div>
+        <pre><span class="cm">&lt;!-- Camada 1: grade --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"cards-grid"</span><span class="tg">&gt;</span>
+
+  <span class="cm">&lt;!-- Camada 2: card individual --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card"</span><span class="tg">&gt;</span>
+
+    <span class="cm">&lt;!-- Camada 3a: imagem --&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-image"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;img</span> <span class="at">src</span>=<span class="vl">"foto.jpg"</span> <span class="at">alt</span>=<span class="vl">"..."</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+
+    <span class="cm">&lt;!-- Camada 3b: textos --&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-body"</span><span class="tg">&gt;</span>
+
+      <span class="cm">&lt;!-- Camada 4: conteúdo --&gt;</span>
+      <span class="tg">&lt;span</span> <span class="at">class</span>=<span class="vl">"tag"</span><span class="tg">&gt;</span>Tecnologia<span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;h3&gt;</span>Título da notícia<span class="tg">&lt;/h3&gt;</span>
+      <span class="tg">&lt;p&gt;</span>Resumo breve...<span class="tg">&lt;/p&gt;</span>
+
+      <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-footer"</span><span class="tg">&gt;</span>
+        <span class="tg">&lt;span&gt;</span>Autor<span class="tg">&lt;/span&gt;</span>
+        <span class="tg">&lt;span&gt;</span>há 2h<span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;/div&gt;</span>
+
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- repita .card para cada notícia --&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3. CSS DO CARD -->
+  <section>
+    <div class="section-label">03 — CSS completo do card de notícia</div>
+    <div class="grid2">
+
+      <div class="card">
+        <div class="card-head"><span class="dot green"></span> Grade + Card</div>
+        <pre><span class="cm">/* Grade de 3 colunas */</span>
+<span class="se">.cards-grid</span> {
+  <span class="pr">display</span>: grid;
+  <span class="pr">grid-template-columns</span>:
+    repeat(<span class="nu">3</span>, <span class="nu">1fr</span>);
+  <span class="pr">gap</span>: <span class="nu">1.5rem</span>;
+  <span class="pr">padding</span>: <span class="nu">2rem</span>;
+}
+
+<span class="cm">/* O card em si */</span>
+<span class="se">.card</span> {
+  <span class="pr">background</span>: <span class="vl">#fff</span>;
+  <span class="pr">border</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+  <span class="pr">border-radius</span>: <span class="nu">12px</span>;
+  <span class="pr">overflow</span>: hidden;
+  <span class="cm">/* ↑ essencial! sem isso a imagem
+      ultrapassa o border-radius */</span>
+}
+
+<span class="cm">/* Efeito hover no card */</span>
+<span class="se">.card:hover</span> {
+  <span class="pr">box-shadow</span>:
+    <span class="nu">0</span> <span class="nu">8px</span> <span class="nu">24px</span> rgba(<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">.08</span>);
+  <span class="pr">transform</span>: translateY(-<span class="nu">3px</span>);
+  <span class="pr">transition</span>: all <span class="nu">0.2s</span>;
+}</pre>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="dot green"></span> Imagem + Body + Footer</div>
+        <pre><span class="cm">/* Imagem ocupa toda a largura */</span>
+<span class="se">.card-image img</span> {
+  <span class="pr">width</span>: <span class="nu">100%</span>;
+  <span class="pr">height</span>: <span class="nu">160px</span>;
+  <span class="pr">object-fit</span>: cover;
+  <span class="cm">/* ↑ corta a img sem distorcer */</span>
+  <span class="pr">display</span>: block;
+}
+
+<span class="cm">/* Área de texto */</span>
+<span class="se">.card-body</span> {
+  <span class="pr">padding</span>: <span class="nu">1rem</span>;
+}
+<span class="se">.card-body h3</span> {
+  <span class="pr">font-size</span>: <span class="nu">1rem</span>;
+  <span class="pr">margin</span>: <span class="nu">0.5rem</span> <span class="nu">0</span> <span class="nu">0.3rem</span>;
+}
+<span class="se">.card-body p</span> {
+  <span class="pr">font-size</span>: <span class="nu">0.85rem</span>;
+  <span class="pr">color</span>: <span class="vl">#777</span>;
+}
+
+<span class="cm">/* Rodapé: autor + data */</span>
+<span class="se">.card-footer</span> {
+  <span class="pr">display</span>: flex;
+  <span class="pr">justify-content</span>: space-between;
+  <span class="pr">border-top</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+  <span class="pr">padding-top</span>: <span class="nu">0.6rem</span>;
+  <span class="pr">margin-top</span>: <span class="nu">0.75rem</span>;
+  <span class="pr">font-size</span>: <span class="nu">0.75rem</span>;
+  <span class="pr">color</span>: <span class="vl">#aaa</span>;
+}</pre>
+      </div>
+
+    </div>
+
+    <div style="margin-top:1rem;" class="card">
+      <div class="card-head"><span class="dot green"></span> Tag colorida (badge/pill)</div>
+      <pre><span class="cm">/* Estilo genérico da tag */</span>
+<span class="se">.tag</span> {
+  <span class="pr">display</span>: inline-block; <span class="cm">/* comportamento de bloco mas inline */</span>
+  <span class="pr">font-size</span>: <span class="nu">0.7rem</span>;
+  <span class="pr">font-weight</span>: <span class="nu">700</span>;
+  <span class="pr">padding</span>: <span class="nu">3px</span> <span class="nu">10px</span>;
+  <span class="pr">border-radius</span>: <span class="nu">100px</span>; <span class="cm">/* valor alto = formato de pílula */</span>
+  <span class="pr">background</span>: <span class="vl">#dbeafe</span>;
+  <span class="pr">color</span>: <span class="vl">#1e40af</span>;
+}
+
+<span class="cm">/* Variações por categoria (adicione quantas precisar) */</span>
+<span class="se">.tag.economia</span> { <span class="pr">background</span>: <span class="vl">#d1fae5</span>; <span class="pr">color</span>: <span class="vl">#065f46</span>; }
+<span class="se">.tag.politica</span>  { <span class="pr">background</span>: <span class="vl">#fee2e2</span>; <span class="pr">color</span>: <span class="vl">#991b1b</span>; }
+<span class="se">.tag.esporte</span>   { <span class="pr">background</span>: <span class="vl">#fef3c7</span>; <span class="pr">color</span>: <span class="vl">#92400e</span>; }</pre>
+    </div>
+  </section>
+
+  <!-- 4. DEMO VISUAL -->
+  <section>
+    <div class="section-label">04 — Resultado final (como fica na tela)</div>
+    <div class="card">
+      <div class="card-head"><span class="dot blue"></span> Site de notícias — 3 cards</div>
+      <div class="demo-news">
+
+        <div class="news-card">
+          <div class="news-img" style="background:#dbeafe;">📷 imagem</div>
+          <div class="news-body">
+            <span class="news-tag" style="background:#dbeafe;color:#1e40af;">Tecnologia</span>
+            <div class="news-title">IA supera humanos em teste de raciocínio</div>
+            <div class="news-desc">Pesquisadores publicaram resultados em novo estudo sobre abstração.</div>
+            <div class="news-footer"><span>João Silva</span><span>há 2h</span></div>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-img" style="background:#d1fae5;">📷 imagem</div>
+          <div class="news-body">
+            <span class="news-tag" style="background:#d1fae5;color:#065f46;">Economia</span>
+            <div class="news-title">Dólar cai 3% após decisão do banco central</div>
+            <div class="news-desc">Mercados reagiram positivamente ao comunicado divulgado ontem.</div>
+            <div class="news-footer"><span>Ana Lima</span><span>há 5h</span></div>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-img" style="background:#fef3c7;">📷 imagem</div>
+          <div class="news-body">
+            <span class="news-tag" style="background:#fef3c7;color:#92400e;">Esporte</span>
+            <div class="news-title">Brasil garante vaga nas semifinais da Copa</div>
+            <div class="news-desc">Seleção venceu por 2 a 0 em jogo disputado até o último minuto.</div>
+            <div class="news-footer"><span>Pedro Costa</span><span>há 1h</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ERROS COMUNS -->
+  <section>
+    <div class="section-label">05 — Erros mais comuns em prova</div>
+    <div class="card">
+      <div class="card-head"><span class="dot pink"></span> O que costuma dar errado e como corrigir</div>
+      <table>
+        <thead><tr><th>Erro</th><th>Problema</th><th>Solução</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td><code>&lt;div class="card"&gt;&lt;img ...&gt;&lt;/div&gt;</code> mas a imagem sai do arredondado</td>
+            <td class="muted">Faltou <code>overflow: hidden</code> no <code>.card</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td>Imagem distorcida ou esticada no card</td>
+            <td class="muted">Adicione <code>object-fit: cover</code> e <code>width: 100%</code> na <code>img</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td>Cards empilhados verticalmente em vez de lado a lado</td>
+            <td class="muted">O pai precisa ter <code>display: grid</code> ou <code>display: flex</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td>CSS não está sendo aplicado</td>
+            <td class="muted">Verifique se o nome no <code>href</code> do link bate exatamente com o arquivo <code>.css</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td>Div aberta mas não fechada — tudo bagunçado</td>
+            <td class="muted">Para cada <code>&lt;div&gt;</code> que você abre, tem de ter um <code>&lt;/div&gt;</code> correspondente</td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td><code>margin: auto</code> não centraliza</td>
+            <td class="muted">O elemento precisa ser <code>display: block</code> e ter <code>width</code> definido</td>
+          </tr>
+          <tr>
+            <td><span class="pill no">Errado</span></td>
+            <td>Texto não aparece sobre o fundo colorido</td>
+            <td class="muted">Sempre defina <code>color</code> explicitamente quando usar <code>background</code> escuro</td>
+          </tr>
+          <tr>
+            <td><span class="pill ok">Certo</span></td>
+            <td colspan="2" class="muted">Sempre que criar um card, pense: <em>imagem → body → footer</em>. Escreva o HTML antes do CSS.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. RECEITA RÁPIDA -->
+  <section>
+    <div class="section-label">06 — Receita: site de notícias do zero (passo a passo)</div>
+    <div class="grid2">
+
+      <div class="card">
+        <div class="card-head"><span class="dot blue"></span> Passo 1 — estrutura HTML</div>
+        <pre><span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang</span>=<span class="vl">"pt-BR"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset</span>=<span class="vl">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">name</span>=<span class="vl">"viewport"</span>
+    <span class="at">content</span>=<span class="vl">"width=device-width,
+             initial-scale=1.0"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Portal de Notícias<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel</span>=<span class="vl">"stylesheet"</span>
+        <span class="at">href</span>=<span class="vl">"style.css"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+
+  <span class="tg">&lt;header&gt;</span>
+    <span class="tg">&lt;nav</span> <span class="at">class</span>=<span class="vl">"navbar"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"logo"</span><span class="tg">&gt;</span>InfoNews<span class="tg">&lt;/div&gt;</span>
+      <span class="tg">&lt;ul</span> <span class="at">class</span>=<span class="vl">"nav-links"</span><span class="tg">&gt;</span>
+        <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Início<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Política<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Economia<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tg">&lt;/ul&gt;</span>
+    <span class="tg">&lt;/nav&gt;</span>
+  <span class="tg">&lt;/header&gt;</span>
+
+  <span class="tg">&lt;main&gt;</span>
+    <span class="tg">&lt;section</span> <span class="at">class</span>=<span class="vl">"noticias"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;h2&gt;</span>Últimas Notícias<span class="tg">&lt;/h2&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"cards-grid"</span><span class="tg">&gt;</span>
+
+        <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card"</span><span class="tg">&gt;</span>
+          <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-image"</span><span class="tg">&gt;</span>
+            <span class="tg">&lt;img</span> <span class="at">src</span>=<span class="vl">"img1.jpg"</span>
+                 <span class="at">alt</span>=<span class="vl">"IA"</span><span class="tg">&gt;</span>
+          <span class="tg">&lt;/div&gt;</span>
+          <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-body"</span><span class="tg">&gt;</span>
+            <span class="tg">&lt;span</span> <span class="at">class</span>=<span class="vl">"tag"</span><span class="tg">&gt;</span>Tech<span class="tg">&lt;/span&gt;</span>
+            <span class="tg">&lt;h3&gt;</span>Título aqui<span class="tg">&lt;/h3&gt;</span>
+            <span class="tg">&lt;p&gt;</span>Resumo...<span class="tg">&lt;/p&gt;</span>
+            <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card-footer"</span><span class="tg">&gt;</span>
+              <span class="tg">&lt;span&gt;</span>Autor<span class="tg">&lt;/span&gt;</span>
+              <span class="tg">&lt;span&gt;</span>há 1h<span class="tg">&lt;/span&gt;</span>
+            <span class="tg">&lt;/div&gt;</span>
+          <span class="tg">&lt;/div&gt;</span>
+        <span class="tg">&lt;/div&gt;</span>
+
+        <span class="cm">&lt;!-- copie o .card acima
+             para cada notícia --&gt;</span>
+
+      <span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;/section&gt;</span>
+  <span class="tg">&lt;/main&gt;</span>
+
+  <span class="tg">&lt;footer&gt;</span>
+    <span class="tg">&lt;p&gt;</span>© 2025 InfoNews<span class="tg">&lt;/p&gt;</span>
+  <span class="tg">&lt;/footer&gt;</span>
+
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="dot green"></span> Passo 2 — style.css completo</div>
+        <pre><span class="cm">/* === RESET === */</span>
+<span class="se">*</span>, <span class="se">*::before</span>, <span class="se">*::after</span> {
+  <span class="pr">box-sizing</span>: border-box;
+  <span class="pr">margin</span>: <span class="nu">0</span>; <span class="pr">padding</span>: <span class="nu">0</span>;
+}
+<span class="se">body</span> {
+  <span class="pr">font-family</span>: Arial, sans-serif;
+  <span class="pr">background</span>: <span class="vl">#f5f5f5</span>;
+  <span class="pr">color</span>: <span class="vl">#333</span>;
+}
+<span class="se">img</span> { <span class="pr">max-width</span>: <span class="nu">100%</span>; <span class="pr">display</span>: block; }
+
+<span class="cm">/* === NAVBAR === */</span>
+<span class="se">.navbar</span> {
+  <span class="pr">display</span>: flex;
+  <span class="pr">justify-content</span>: space-between;
+  <span class="pr">align-items</span>: center;
+  <span class="pr">padding</span>: <span class="nu">1rem</span> <span class="nu">2rem</span>;
+  <span class="pr">background</span>: <span class="vl">#111</span>;
+}
+<span class="se">.logo</span> {
+  <span class="pr">color</span>: <span class="vl">#fff</span>;
+  <span class="pr">font-size</span>: <span class="nu">1.4rem</span>;
+  <span class="pr">font-weight</span>: <span class="nu">700</span>;
+}
+<span class="se">.nav-links</span> {
+  <span class="pr">list-style</span>: none;
+  <span class="pr">display</span>: flex;
+  <span class="pr">gap</span>: <span class="nu">1.5rem</span>;
+}
+<span class="se">.nav-links a</span> {
+  <span class="pr">color</span>: <span class="vl">#ccc</span>;
+  <span class="pr">text-decoration</span>: none;
+}
+<span class="se">.nav-links a:hover</span> { <span class="pr">color</span>: <span class="vl">#fff</span>; }
+
+<span class="cm">/* === SEÇÃO === */</span>
+<span class="se">.noticias</span> {
+  <span class="pr">padding</span>: <span class="nu">2rem</span>;
+}
+<span class="se">.noticias h2</span> {
+  <span class="pr">font-size</span>: <span class="nu">1.4rem</span>;
+  <span class="pr">margin-bottom</span>: <span class="nu">1.5rem</span>;
+}
+
+<span class="cm">/* === GRADE === */</span>
+<span class="se">.cards-grid</span> {
+  <span class="pr">display</span>: grid;
+  <span class="pr">grid-template-columns</span>:
+    repeat(<span class="nu">3</span>, <span class="nu">1fr</span>);
+  <span class="pr">gap</span>: <span class="nu">1.5rem</span>;
+}
+
+<span class="cm">/* === CARD === */</span>
+<span class="se">.card</span> {
+  <span class="pr">background</span>: <span class="vl">#fff</span>;
+  <span class="pr">border-radius</span>: <span class="nu">10px</span>;
+  <span class="pr">border</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+  <span class="pr">overflow</span>: hidden;
+}
+<span class="se">.card-image img</span> {
+  <span class="pr">width</span>: <span class="nu">100%</span>;
+  <span class="pr">height</span>: <span class="nu">160px</span>;
+  <span class="pr">object-fit</span>: cover;
+}
+<span class="se">.card-body</span> {
+  <span class="pr">padding</span>: <span class="nu">1rem</span>;
+}
+<span class="se">.card-body h3</span> {
+  <span class="pr">font-size</span>: <span class="nu">1rem</span>;
+  <span class="pr">margin</span>: <span class="nu">0.5rem</span> <span class="nu">0</span> <span class="nu">0.3rem</span>;
+}
+<span class="se">.card-body p</span> {
+  <span class="pr">font-size</span>: <span class="nu">0.85rem</span>;
+  <span class="pr">color</span>: <span class="vl">#666</span>;
+}
+<span class="se">.tag</span> {
+  <span class="pr">display</span>: inline-block;
+  <span class="pr">font-size</span>: <span class="nu">0.7rem</span>;
+  <span class="pr">font-weight</span>: <span class="nu">700</span>;
+  <span class="pr">padding</span>: <span class="nu">3px</span> <span class="nu">10px</span>;
+  <span class="pr">border-radius</span>: <span class="nu">100px</span>;
+  <span class="pr">background</span>: <span class="vl">#dbeafe</span>;
+  <span class="pr">color</span>: <span class="vl">#1e40af</span>;
+}
+<span class="se">.card-footer</span> {
+  <span class="pr">display</span>: flex;
+  <span class="pr">justify-content</span>: space-between;
+  <span class="pr">border-top</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+  <span class="pr">padding-top</span>: <span class="nu">0.6rem</span>;
+  <span class="pr">margin-top</span>: <span class="nu">0.75rem</span>;
+  <span class="pr">font-size</span>: <span class="nu">0.75rem</span>;
+  <span class="pr">color</span>: <span class="vl">#aaa</span>;
+}
+
+<span class="cm">/* === FOOTER === */</span>
+<span class="se">footer</span> {
+  <span class="pr">text-align</span>: center;
+  <span class="pr">padding</span>: <span class="nu">1.5rem</span>;
+  <span class="pr">background</span>: <span class="vl">#111</span>;
+  <span class="pr">color</span>: <span class="vl">#666</span>;
+  <span class="pr">font-size</span>: <span class="nu">0.85rem</span>;
+}</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7. CHECKLIST -->
+  <section>
+    <div class="section-label">07 — Checklist antes de entregar</div>
+    <div class="card">
+      <div class="card-head"><span class="dot pink"></span> Bata esses pontos antes de chamar o professor</div>
+      <table>
+        <tbody>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">Todo <code>&lt;div&gt;</code> aberto tem um <code>&lt;/div&gt;</code> fechado?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">O <code>&lt;link&gt;</code> do CSS está dentro do <code>&lt;head&gt;</code>?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">O nome do arquivo <code>.css</code> bate com o <code>href</code> do link?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">O container da grade tem <code>display: grid</code>?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">O <code>.card</code> tem <code>overflow: hidden</code> (para a imagem não vazar)?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">A imagem tem <code>width: 100%</code> e <code>object-fit: cover</code>?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">A navbar usa <code>display: flex</code> + <code>justify-content: space-between</code>?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">Removeu <code>list-style: none</code> do <code>&lt;ul&gt;</code> da navbar?</td></tr>
+          <tr><td><span class="pill ok">✓</span></td><td class="muted">Os links da navbar têm <code>text-decoration: none</code>?</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Material de Consulta · Parte 2 — Divs Aninhadas & Cards &nbsp;·&nbsp; Ciência de Dados & IA · 2025
+  </footer>
+
+</div>
+</body>
+</html>

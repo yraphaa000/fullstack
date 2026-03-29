@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material de Consulta — HTML & CSS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #18181f;
+    --surface2: #22222c;
+    --border: #2e2e3a;
+    --accent: #7c6af7;
+    --accent2: #3ecfb2;
+    --accent3: #f7a24a;
+    --danger: #f76a6a;
+    --text: #e8e8f0;
+    --muted: #8888aa;
+    --code-bg: #0a0a0f;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 120px;
+    background: radial-gradient(ellipse, rgba(124,106,247,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); font-size: 0.95rem; margin-top: 0.4rem; }
+  .tags { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 100px;
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .tag.html { border-color: rgba(247,162,74,0.4); color: var(--accent3); }
+  .tag.css  { border-color: rgba(62,207,178,0.4); color: var(--accent2); }
+
+  /* SECTION */
+  section { margin-bottom: 2.5rem; }
+  .section-title {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* CARDS GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 0.7rem 1rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem; font-weight: 600; color: var(--muted);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.orange { background: var(--accent3); }
+  .dot.green  { background: var(--accent2); }
+  .dot.purple { background: var(--accent); }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--code-bg);
+    padding: 1rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.75;
+    overflow-x: auto;
+    color: #c8c8e8;
+  }
+  .kw  { color: #bf86fa; }   /* keyword */
+  .at  { color: #82d9f5; }   /* attribute */
+  .vl  { color: #f7a24a; }   /* value / string */
+  .cm  { color: #555577; font-style: italic; }  /* comment */
+  .tg  { color: #3ecfb2; }   /* tag */
+  .se  { color: #f76a6a; }   /* selector */
+  .pr  { color: #82d9f5; }   /* property */
+  .nu  { color: #f7a24a; }   /* number/unit */
+
+  /* TABLE */
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .ref-table th {
+    text-align: left; padding: 0.5rem 0.75rem;
+    background: var(--surface2); color: var(--muted);
+    font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ref-table td { padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem; color: var(--accent2);
+    background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
+  }
+  .ref-table .desc { color: var(--muted); font-size: 0.78rem; }
+
+  /* PILL / BADGE */
+  .pill {
+    display: inline-block; font-size: 0.68rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 100px; letter-spacing: 0.04em;
+  }
+  .pill.css  { background: rgba(62,207,178,0.12); color: var(--accent2); border: 1px solid rgba(62,207,178,0.25); }
+  .pill.html { background: rgba(247,162,74,0.12); color: var(--accent3); border: 1px solid rgba(247,162,74,0.25); }
+  .pill.tip  { background: rgba(124,106,247,0.12); color: var(--accent);  border: 1px solid rgba(124,106,247,0.25); }
+  .pill.warn { background: rgba(247,106,106,0.12); color: var(--danger);  border: 1px solid rgba(247,106,106,0.25); }
+
+  /* TIP BOX */
+  .tip-box {
+    background: rgba(124,106,247,0.07);
+    border: 1px solid rgba(124,106,247,0.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.8rem 1rem;
+    font-size: 0.82rem; color: var(--muted);
+    margin-top: 0.75rem;
+  }
+  .tip-box strong { color: var(--text); }
+
+  /* WIDE CARD */
+  .wide-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  /* CHEAT ROW */
+  .cheat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .cheat-row { grid-template-columns: 1fr; } }
+
+  /* VISUAL DEMO */
+  .demo-box {
+    padding: 1rem;
+    background: var(--code-bg);
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .box-demo {
+    width: 50px; height: 50px; border-radius: 4px;
+    background: var(--accent); display: flex; align-items: center;
+    justify-content: center; font-size: 0.65rem; color: #fff; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  footer {
+    text-align: center; margin-top: 3rem;
+    color: var(--muted); font-size: 0.78rem;
+    border-top: 1px solid var(--border); padding-top: 1.5rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <h1>Material de Consulta — <span>Full Stack</span></h1>
+    <p>Graduação em Ciência de Dados & IA — Prova Prática</p>
+    <div class="tags">
+      <span class="tag html">HTML5</span>
+      <span class="tag css">CSS3</span>
+      <span class="tag">Flexbox</span>
+      <span class="tag">Grid</span>
+      <span class="tag">Box Model</span>
+      <span class="tag">Seletores</span>
+    </div>
+  </header>
+
+  <!-- 1. ESTRUTURA HTML -->
+  <section>
+    <div class="section-title">01 — Estrutura base do HTML</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot orange"></span> index.html — esqueleto obrigatório</div>
+      <pre><span class="cm">&lt;!-- Cole isso em todo arquivo HTML novo --&gt;</span>
+<span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang</span>=<span class="vl">"pt-BR"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset</span>=<span class="vl">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">name</span>=<span class="vl">"viewport"</span> <span class="at">content</span>=<span class="vl">"width=device-width, initial-scale=1.0"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Título da Página<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel</span>=<span class="vl">"stylesheet"</span> <span class="at">href</span>=<span class="vl">"style.css"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+
+  <span class="tg">&lt;header&gt;</span><span class="cm"> ... navbar / logo </span><span class="tg">&lt;/header&gt;</span>
+  <span class="tg">&lt;main&gt;</span><span class="cm"> ... conteúdo principal </span><span class="tg">&lt;/main&gt;</span>
+  <span class="tg">&lt;footer&gt;</span><span class="cm"> ... rodapé </span><span class="tg">&lt;/footer&gt;</span>
+
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+    </div>
+  </section>
+
+  <!-- 2. TAGS MAIS USADAS -->
+  <section>
+    <div class="section-title">02 — Tags HTML essenciais</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot orange"></span> Referência rápida</div>
+      <table class="ref-table">
+        <thead><tr><th>Tag</th><th>Para que serve</th><th>Exemplo</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;header&gt;</code></td><td class="desc">Cabeçalho / navbar</td><td><code>&lt;header&gt;...&lt;/header&gt;</code></td></tr>
+          <tr><td><code>&lt;nav&gt;</code></td><td class="desc">Menu de navegação</td><td><code>&lt;nav&gt;&lt;a&gt;...&lt;/a&gt;&lt;/nav&gt;</code></td></tr>
+          <tr><td><code>&lt;main&gt;</code></td><td class="desc">Conteúdo principal da página</td><td><code>&lt;main&gt;...&lt;/main&gt;</code></td></tr>
+          <tr><td><code>&lt;section&gt;</code></td><td class="desc">Seção temática</td><td><code>&lt;section&gt;...&lt;/section&gt;</code></td></tr>
+          <tr><td><code>&lt;article&gt;</code></td><td class="desc">Conteúdo independente (card, post)</td><td><code>&lt;article&gt;...&lt;/article&gt;</code></td></tr>
+          <tr><td><code>&lt;div&gt;</code></td><td class="desc">Container genérico (sem semântica)</td><td><code>&lt;div class="card"&gt;...&lt;/div&gt;</code></td></tr>
+          <tr><td><code>&lt;h1&gt;–&lt;h6&gt;</code></td><td class="desc">Títulos (h1 = maior)</td><td><code>&lt;h1&gt;Título Principal&lt;/h1&gt;</code></td></tr>
+          <tr><td><code>&lt;p&gt;</code></td><td class="desc">Parágrafo de texto</td><td><code>&lt;p&gt;Texto aqui.&lt;/p&gt;</code></td></tr>
+          <tr><td><code>&lt;a&gt;</code></td><td class="desc">Link / âncora</td><td><code>&lt;a href="url"&gt;clique&lt;/a&gt;</code></td></tr>
+          <tr><td><code>&lt;img&gt;</code></td><td class="desc">Imagem (tag vazia, sem fechamento)</td><td><code>&lt;img src="img.jpg" alt="desc"&gt;</code></td></tr>
+          <tr><td><code>&lt;ul&gt; / &lt;ol&gt;</code></td><td class="desc">Lista não ordenada / ordenada</td><td><code>&lt;ul&gt;&lt;li&gt;Item&lt;/li&gt;&lt;/ul&gt;</code></td></tr>
+          <tr><td><code>&lt;button&gt;</code></td><td class="desc">Botão clicável</td><td><code>&lt;button&gt;Clique&lt;/button&gt;</code></td></tr>
+          <tr><td><code>&lt;span&gt;</code></td><td class="desc">Container inline (dentro de texto)</td><td><code>&lt;p&gt;Cor &lt;span&gt;azul&lt;/span&gt;&lt;/p&gt;</code></td></tr>
+          <tr><td><code>&lt;footer&gt;</code></td><td class="desc">Rodapé da página</td><td><code>&lt;footer&gt;© 2025&lt;/footer&gt;</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. CSS RESET + TIPOGRAFIA -->
+  <section>
+    <div class="section-title">03 — CSS: reset e tipografia</div>
+    <div class="cheat-row">
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Reset básico</div>
+        <pre><span class="cm">/* Zera margens e padding padrão */</span>
+<span class="se">*</span>, <span class="se">*::before</span>, <span class="se">*::after</span> {
+  <span class="pr">box-sizing</span>: border-box;
+  <span class="pr">margin</span>: <span class="nu">0</span>;
+  <span class="pr">padding</span>: <span class="nu">0</span>;
+}
+
+<span class="se">body</span> {
+  <span class="pr">font-family</span>: Arial, sans-serif;
+  <span class="pr">font-size</span>: <span class="nu">16px</span>;
+  <span class="pr">line-height</span>: <span class="nu">1.6</span>;
+  <span class="pr">color</span>: <span class="vl">#333</span>;
+  <span class="pr">background</span>: <span class="vl">#fff</span>;
+}
+
+<span class="se">img</span> {
+  <span class="pr">max-width</span>: <span class="nu">100%</span>;
+  <span class="pr">display</span>: block;
+}</pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Tipografia comum</div>
+        <pre><span class="se">h1</span> { <span class="pr">font-size</span>: <span class="nu">2rem</span>; <span class="pr">font-weight</span>: <span class="nu">700</span>; }
+<span class="se">h2</span> { <span class="pr">font-size</span>: <span class="nu">1.5rem</span>; <span class="pr">font-weight</span>: <span class="nu">600</span>; }
+<span class="se">h3</span> { <span class="pr">font-size</span>: <span class="nu">1.25rem</span>; }
+
+<span class="se">p</span> {
+  <span class="pr">margin-bottom</span>: <span class="nu">1rem</span>;
+  <span class="pr">color</span>: <span class="vl">#555</span>;
+}
+
+<span class="se">a</span> {
+  <span class="pr">color</span>: <span class="vl">#0066cc</span>;
+  <span class="pr">text-decoration</span>: none;
+}
+<span class="se">a:hover</span> {
+  <span class="pr">text-decoration</span>: underline;
+}
+
+<span class="cm">/* Centralizar texto */</span>
+<span class="se">.text-center</span> { <span class="pr">text-align</span>: center; }</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. BOX MODEL -->
+  <section>
+    <div class="section-title">04 — Box model (essencial!)</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot green"></span> Como o CSS calcula o tamanho dos elementos</div>
+      <pre><span class="cm">/*
+  Todo elemento é uma caixa com 4 camadas:
+
+  ┌─────────────────────────────────┐  ← margin (espaço fora do elemento)
+  │  ┌───────────────────────────┐  │  ← border (borda)
+  │  │  ┌─────────────────────┐  │  │  ← padding (espaço interno)
+  │  │  │     CONTEÚDO        │  │  │
+  │  │  └─────────────────────┘  │  │
+  │  └───────────────────────────┘  │
+  └─────────────────────────────────┘
+
+  Com box-sizing: border-box (recomendado!):
+  width/height incluem padding e border.
+*/</span>
+
+<span class="se">.caixa</span> {
+  <span class="pr">width</span>: <span class="nu">300px</span>;
+  <span class="pr">padding</span>: <span class="nu">20px</span>;           <span class="cm">/* espaço interno */</span>
+  <span class="pr">margin</span>: <span class="nu">16px</span> <span class="nu">auto</span>;      <span class="cm">/* centraliza horizontalmente */</span>
+  <span class="pr">border</span>: <span class="nu">2px</span> solid <span class="vl">#333</span>; <span class="cm">/* borda */</span>
+  <span class="pr">border-radius</span>: <span class="nu">8px</span>;      <span class="cm">/* cantos arredondados */</span>
+}</pre>
+    </div>
+  </section>
+
+  <!-- 5. FLEXBOX -->
+  <section>
+    <div class="section-title">05 — Flexbox (layout em linha/coluna)</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot green"></span> Propriedades do container flex</div>
+      <pre><span class="se">.container</span> {
+  <span class="pr">display</span>: flex;
+
+  <span class="cm">/* Direção dos filhos */</span>
+  <span class="pr">flex-direction</span>: row;           <span class="cm">/* → horizontal (padrão) */</span>
+  <span class="pr">flex-direction</span>: column;        <span class="cm">/* ↓ vertical */</span>
+
+  <span class="cm">/* Alinhamento no eixo principal (horizontal) */</span>
+  <span class="pr">justify-content</span>: flex-start;   <span class="cm">/* ← alinha à esquerda */</span>
+  <span class="pr">justify-content</span>: center;       <span class="cm">/* centraliza */</span>
+  <span class="pr">justify-content</span>: flex-end;     <span class="cm">/* → alinha à direita */</span>
+  <span class="pr">justify-content</span>: space-between;<span class="cm">/* espaço entre items */</span>
+  <span class="pr">justify-content</span>: space-around; <span class="cm">/* espaço ao redor */</span>
+
+  <span class="cm">/* Alinhamento no eixo cruzado (vertical) */</span>
+  <span class="pr">align-items</span>: flex-start;       <span class="cm">/* topo */</span>
+  <span class="pr">align-items</span>: center;           <span class="cm">/* meio (uso mais comum!) */</span>
+  <span class="pr">align-items</span>: flex-end;         <span class="cm">/* fundo */</span>
+  <span class="pr">align-items</span>: stretch;          <span class="cm">/* estica (padrão) */</span>
+
+  <span class="cm">/* Espaço entre filhos */</span>
+  <span class="pr">gap</span>: <span class="nu">16px</span>;                     <span class="cm">/* gap entre todos */</span>
+  <span class="pr">gap</span>: <span class="nu">8px</span> <span class="nu">16px</span>;                 <span class="cm">/* row-gap column-gap */</span>
+
+  <span class="cm">/* Quebrar linha se não couber */</span>
+  <span class="pr">flex-wrap</span>: wrap;
+}</pre>
+    </div>
+    <div class="tip-box">
+      <strong>Dica de prova:</strong> Para centralizar algo na tela inteira: <code style="font-family:monospace;color:#3ecfb2;font-size:0.82rem">display:flex; justify-content:center; align-items:center; min-height:100vh</code>
+    </div>
+  </section>
+
+  <!-- 6. CSS GRID -->
+  <section>
+    <div class="section-title">06 — CSS Grid (layout em grade)</div>
+    <div class="cheat-row">
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Grid básico</div>
+        <pre><span class="se">.grid</span> {
+  <span class="pr">display</span>: grid;
+
+  <span class="cm">/* 3 colunas iguais */</span>
+  <span class="pr">grid-template-columns</span>:
+    repeat(<span class="nu">3</span>, <span class="nu">1fr</span>);
+
+  <span class="cm">/* colunas de tamanhos fixos */</span>
+  <span class="pr">grid-template-columns</span>:
+    <span class="nu">200px</span> <span class="nu">1fr</span> <span class="nu">100px</span>;
+
+  <span class="cm">/* responsivo automático */</span>
+  <span class="pr">grid-template-columns</span>:
+    repeat(auto-fit,
+      minmax(<span class="nu">250px</span>, <span class="nu">1fr</span>));
+
+  <span class="pr">gap</span>: <span class="nu">1rem</span>; <span class="cm">/* espaço entre células */</span>
+}</pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Item ocupando várias colunas</div>
+        <pre><span class="cm">/* Item que ocupa 2 colunas */</span>
+<span class="se">.destaque</span> {
+  <span class="pr">grid-column</span>: span <span class="nu">2</span>;
+}
+
+<span class="cm">/* Item ocupa da coluna 1 até 3 */</span>
+<span class="se">.full</span> {
+  <span class="pr">grid-column</span>: <span class="nu">1</span> / <span class="nu">3</span>;
+}
+
+<span class="cm">/* Header ocupa toda a largura */</span>
+<span class="se">header</span> {
+  <span class="pr">grid-column</span>: <span class="nu">1</span> / -<span class="nu">1</span>;
+  <span class="cm">/* -1 = última linha/coluna */</span>
+}
+
+<span class="cm">/* 2 linhas de altura */</span>
+<span class="se">.tall</span> {
+  <span class="pr">grid-row</span>: span <span class="nu">2</span>;
+}</pre>
+      </div>
+    </div>
+    <div class="tip-box">
+      <strong>Flexbox vs Grid:</strong> Use <strong>flex</strong> para itens em uma única direção (navbar, linha de botões). Use <strong>grid</strong> para layouts em duas dimensões (cards, galeria, dashboard).
+    </div>
+  </section>
+
+  <!-- 7. NAVBAR -->
+  <section>
+    <div class="section-title">07 — Navbar (padrão mais cobrado em prova)</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot orange"></span> HTML + CSS completo</div>
+      <pre><span class="cm">&lt;!-- HTML --&gt;</span>
+<span class="tg">&lt;header&gt;</span>
+  <span class="tg">&lt;nav</span> <span class="at">class</span>=<span class="vl">"navbar"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"logo"</span><span class="tg">&gt;</span>MeuSite<span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;ul</span> <span class="at">class</span>=<span class="vl">"nav-links"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Início<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Sobre<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Contato<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tg">&lt;/ul&gt;</span>
+  <span class="tg">&lt;/nav&gt;</span>
+<span class="tg">&lt;/header&gt;</span>
+
+<span class="cm">/* CSS */</span>
+<span class="se">.navbar</span> {
+  <span class="pr">display</span>: flex;
+  <span class="pr">justify-content</span>: space-between; <span class="cm">/* logo à esq, links à dir */</span>
+  <span class="pr">align-items</span>: center;
+  <span class="pr">padding</span>: <span class="nu">1rem</span> <span class="nu">2rem</span>;
+  <span class="pr">background</span>: <span class="vl">#1a1a2e</span>;
+}
+<span class="se">.logo</span> { <span class="pr">color</span>: <span class="vl">#fff</span>; <span class="pr">font-size</span>: <span class="nu">1.3rem</span>; <span class="pr">font-weight</span>: <span class="nu">700</span>; }
+<span class="se">.nav-links</span> {
+  <span class="pr">list-style</span>: none;
+  <span class="pr">display</span>: flex;
+  <span class="pr">gap</span>: <span class="nu">2rem</span>;
+}
+<span class="se">.nav-links a</span> {
+  <span class="pr">color</span>: <span class="vl">#ccc</span>;
+  <span class="pr">text-decoration</span>: none;
+}
+<span class="se">.nav-links a:hover</span> { <span class="pr">color</span>: <span class="vl">#fff</span>; }</pre>
+    </div>
+  </section>
+
+  <!-- 8. CARDS -->
+  <section>
+    <div class="section-title">08 — Cards (grade de 3 colunas)</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot orange"></span> HTML + CSS completo</div>
+      <pre><span class="cm">&lt;!-- HTML --&gt;</span>
+<span class="tg">&lt;section</span> <span class="at">class</span>=<span class="vl">"cards-section"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"cards-grid"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"card"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;h3&gt;</span>Título do Card<span class="tg">&lt;/h3&gt;</span>
+      <span class="tg">&lt;p&gt;</span>Descrição curta do conteúdo.<span class="tg">&lt;/p&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+    <span class="cm">&lt;!-- repita o .card quantas vezes precisar --&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/section&gt;</span>
+
+<span class="cm">/* CSS */</span>
+<span class="se">.cards-section</span> {
+  <span class="pr">padding</span>: <span class="nu">3rem</span> <span class="nu">2rem</span>;
+  <span class="pr">background</span>: <span class="vl">#f5f5f5</span>;
+}
+<span class="se">.cards-grid</span> {
+  <span class="pr">display</span>: grid;
+  <span class="pr">grid-template-columns</span>: repeat(<span class="nu">3</span>, <span class="nu">1fr</span>);
+  <span class="pr">gap</span>: <span class="nu">1.5rem</span>;
+}
+<span class="se">.card</span> {
+  <span class="pr">background</span>: <span class="vl">#fff</span>;
+  <span class="pr">border-radius</span>: <span class="nu">8px</span>;
+  <span class="pr">padding</span>: <span class="nu">1.5rem</span>;
+  <span class="pr">border</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+  <span class="cm">/* sombra suave (opcional) */</span>
+  <span class="pr">box-shadow</span>: <span class="nu">0</span> <span class="nu">2px</span> <span class="nu">8px</span> rgba(<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0.06</span>);
+}
+<span class="se">.card h3</span> { <span class="pr">margin-bottom</span>: <span class="nu">0.5rem</span>; }
+<span class="se">.card p</span>  { <span class="pr">color</span>: <span class="vl">#666</span>; <span class="pr">font-size</span>: <span class="nu">0.9rem</span>; }</pre>
+    </div>
+  </section>
+
+  <!-- 9. BOTÕES -->
+  <section>
+    <div class="section-title">09 — Botões e estados</div>
+    <div class="cheat-row">
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Botão padrão</div>
+        <pre><span class="se">.btn</span> {
+  <span class="pr">display</span>: inline-block;
+  <span class="pr">padding</span>: <span class="nu">0.6rem</span> <span class="nu">1.5rem</span>;
+  <span class="pr">background</span>: <span class="vl">#6c5ce7</span>;
+  <span class="pr">color</span>: <span class="vl">#fff</span>;
+  <span class="pr">border</span>: none;
+  <span class="pr">border-radius</span>: <span class="nu">6px</span>;
+  <span class="pr">font-size</span>: <span class="nu">1rem</span>;
+  <span class="pr">cursor</span>: pointer;
+}
+<span class="se">.btn:hover</span> {
+  <span class="pr">background</span>: <span class="vl">#5a4bd1</span>;
+  <span class="cm">/* cor levemente mais escura */</span>
+}
+<span class="se">.btn-outline</span> {
+  <span class="pr">background</span>: transparent;
+  <span class="pr">border</span>: <span class="nu">2px</span> solid <span class="vl">#6c5ce7</span>;
+  <span class="pr">color</span>: <span class="vl">#6c5ce7</span>;
+}</pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Propriedades úteis</div>
+        <pre><span class="cm">/* Remover estilo padrão de ul */</span>
+<span class="se">ul</span> { <span class="pr">list-style</span>: none; }
+
+<span class="cm">/* Remover sublinhado de link */</span>
+<span class="se">a</span> { <span class="pr">text-decoration</span>: none; }
+
+<span class="cm">/* Cursor mãozinha no hover */</span>
+<span class="se">button, a</span> { <span class="pr">cursor</span>: pointer; }
+
+<span class="cm">/* Esconder elemento */</span>
+<span class="se">.hidden</span> { <span class="pr">display</span>: none; }
+
+<span class="cm">/* Overflow: esconde o que sai */</span>
+<span class="se">.box</span> { <span class="pr">overflow</span>: hidden; }
+
+<span class="cm">/* Transição suave no hover */</span>
+<span class="se">.btn</span> {
+  <span class="pr">transition</span>: background <span class="nu">0.2s</span>;
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. SELETORES CSS -->
+  <section>
+    <div class="section-title">10 — Seletores CSS</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot green"></span> Os mais usados em prova</div>
+      <table class="ref-table">
+        <thead><tr><th>Seletor</th><th>O que seleciona</th><th>Exemplo</th></tr></thead>
+        <tbody>
+          <tr><td><code>*</code></td><td class="desc">Todos os elementos</td><td><code>* { margin: 0; }</code></td></tr>
+          <tr><td><code>tag</code></td><td class="desc">Elemento pela tag</td><td><code>p { color: red; }</code></td></tr>
+          <tr><td><code>.classe</code></td><td class="desc">Elemento com aquela classe</td><td><code>.card { padding: 1rem; }</code></td></tr>
+          <tr><td><code>#id</code></td><td class="desc">Elemento com aquele id (único)</td><td><code>#logo { font-size: 2rem; }</code></td></tr>
+          <tr><td><code>pai filho</code></td><td class="desc">Todo filho dentro do pai</td><td><code>.navbar a { color: #fff; }</code></td></tr>
+          <tr><td><code>pai > filho</code></td><td class="desc">Filhos diretos apenas</td><td><code>ul > li { margin: 0.5rem; }</code></td></tr>
+          <tr><td><code>a, b</code></td><td class="desc">Vários seletores juntos</td><td><code>h1, h2 { font-weight: 700; }</code></td></tr>
+          <tr><td><code>:hover</code></td><td class="desc">Quando o mouse passa por cima</td><td><code>a:hover { color: blue; }</code></td></tr>
+          <tr><td><code>:first-child</code></td><td class="desc">Primeiro filho do pai</td><td><code>li:first-child { color: red; }</code></td></tr>
+          <tr><td><code>:last-child</code></td><td class="desc">Último filho do pai</td><td><code>li:last-child { border: none; }</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 11. POSICIONAMENTO -->
+  <section>
+    <div class="section-title">11 — Posicionamento</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot green"></span> position + z-index</div>
+      <pre><span class="cm">/* static  → padrão, segue o fluxo normal */</span>
+<span class="cm">/* relative → desloca a partir da posição original */</span>
+<span class="cm">/* absolute → posiciona em relação ao pai com position != static */</span>
+<span class="cm">/* fixed    → fica fixo na tela (ex: navbar que fica no topo sempre) */</span>
+
+<span class="cm">/* Exemplo: badge sobre um card */</span>
+<span class="se">.card</span>  { <span class="pr">position</span>: relative; }
+<span class="se">.badge</span> {
+  <span class="pr">position</span>: absolute;
+  <span class="pr">top</span>: <span class="nu">8px</span>; <span class="pr">right</span>: <span class="nu">8px</span>;
+}
+
+<span class="cm">/* Navbar fixa no topo */</span>
+<span class="se">.navbar</span> {
+  <span class="pr">position</span>: fixed;
+  <span class="pr">top</span>: <span class="nu">0</span>; <span class="pr">left</span>: <span class="nu">0</span>; <span class="pr">right</span>: <span class="nu">0</span>;
+  <span class="pr">z-index</span>: <span class="nu">1000</span>; <span class="cm">/* fica acima de tudo */</span>
+}
+
+<span class="cm">/* Centrar absoluto na tela */</span>
+<span class="se">.centrado</span> {
+  <span class="pr">position</span>: absolute;
+  <span class="pr">top</span>: <span class="nu">50%</span>; <span class="pr">left</span>: <span class="nu">50%</span>;
+  <span class="pr">transform</span>: translate(-<span class="nu">50%</span>, -<span class="nu">50%</span>);
+}</pre>
+    </div>
+  </section>
+
+  <!-- 12. CORES E UNIDADES -->
+  <section>
+    <div class="section-title">12 — Cores e unidades</div>
+    <div class="cheat-row">
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Formas de definir cor</div>
+        <pre><span class="cm">/* Nome */</span>
+<span class="pr">color</span>: red;
+<span class="pr">color</span>: white;
+
+<span class="cm">/* Hexadecimal (mais comum) */</span>
+<span class="pr">color</span>: <span class="vl">#ff0000</span>;   <span class="cm">/* vermelho */</span>
+<span class="pr">color</span>: <span class="vl">#333</span>;      <span class="cm">/* cinza escuro */</span>
+<span class="pr">color</span>: <span class="vl">#fff</span>;      <span class="cm">/* branco */</span>
+
+<span class="cm">/* RGB */</span>
+<span class="pr">color</span>: rgb(<span class="nu">255</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+
+<span class="cm">/* RGBA (com transparência) */</span>
+<span class="pr">background</span>: rgba(<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0.5</span>);
+<span class="cm">/* 0 = transparente, 1 = opaco */</span></pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="dot green"></span> Unidades de medida</div>
+        <pre><span class="cm">/* px  → pixel fixo (absoluto) */</span>
+<span class="pr">font-size</span>: <span class="nu">16px</span>;
+
+<span class="cm">/* rem → relativo ao root (body)
+   1rem = 16px por padrão */</span>
+<span class="pr">font-size</span>: <span class="nu">1.5rem</span>; <span class="cm">/* = 24px */</span>
+
+<span class="cm">/* %   → relativo ao pai */</span>
+<span class="pr">width</span>: <span class="nu">50%</span>;
+
+<span class="cm">/* vw/vh → % da viewport
+   100vw = largura total da tela
+   100vh = altura total da tela */</span>
+<span class="pr">min-height</span>: <span class="nu">100vh</span>;
+
+<span class="cm">/* auto → deixa o browser calcular */</span>
+<span class="pr">margin</span>: <span class="nu">0</span> auto; <span class="cm">/* centraliza bloco */</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. DICAS FINAIS -->
+  <section>
+    <div class="section-title">13 — Checklist de prova</div>
+    <div class="wide-card">
+      <div class="card-header"><span class="dot purple"></span> Antes de entregar, verifique</div>
+      <table class="ref-table">
+        <tbody>
+          <tr><td><span class="pill tip">estrutura</span></td><td class="desc">Tem DOCTYPE, html, head, body, charset e viewport?</td></tr>
+          <tr><td><span class="pill html">html</span></td><td class="desc">Usou tags semânticas (header, main, footer, section)?</td></tr>
+          <tr><td><span class="pill css">css</span></td><td class="desc">Tem o reset (box-sizing: border-box; margin:0; padding:0)?</td></tr>
+          <tr><td><span class="pill css">layout</span></td><td class="desc">Navbar usa display:flex + justify-content:space-between?</td></tr>
+          <tr><td><span class="pill css">grid</span></td><td class="desc">Cards usam display:grid + grid-template-columns?</td></tr>
+          <tr><td><span class="pill tip">link</span></td><td class="desc">O &lt;link rel="stylesheet"&gt; está no &lt;head&gt;?</td></tr>
+          <tr><td><span class="pill warn">cuidado</span></td><td class="desc">Fechar todas as tags abertas (exceto img, input, meta, br)?</td></tr>
+          <tr><td><span class="pill warn">cuidado</span></td><td class="desc">Nome do arquivo CSS bate com o href do link?</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Material de Consulta — HTML & CSS &nbsp;·&nbsp; Ciência de Dados & IA &nbsp;·&nbsp; 2025
+  </footer>
+
+</div>
+</body>
+</html>

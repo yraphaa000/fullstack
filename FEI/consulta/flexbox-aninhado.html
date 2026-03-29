@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flexbox — Divs Aninhadas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #f5f4f0;
+    --surf:    #ffffff;
+    --surf2:   #edeae4;
+    --border:  #ddd9d0;
+    --ink:     #18160f;
+    --muted:   #7a776e;
+    --a1:      #d14f1a;  /* laranja */
+    --a2:      #1a5fc9;  /* azul */
+    --a3:      #1a9158;  /* verde */
+    --a4:      #8b1ac9;  /* roxo */
+    --code-bg: #18160f;
+    --code-fg: #e8e4d8;
+
+    /* camadas — cores distintas */
+    --l1-bg: #dbeafe; --l1-bd: #93c5fd; --l1-tx: #1e3a8a;
+    --l2-bg: #fef3c7; --l2-bd: #fcd34d; --l2-tx: #78350f;
+    --l3-bg: #d1fae5; --l3-bd: #6ee7b7; --l3-tx: #064e3b;
+    --l4-bg: #fce7f3; --l4-bd: #f9a8d4; --l4-tx: #831843;
+    --l5-bg: #ede9fe; --l5-bd: #c4b5fd; --l5-tx: #4c1d95;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    padding: 2rem 1rem 5rem;
+  }
+
+  .page { max-width: 1040px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .hdr {
+    background: var(--ink);
+    color: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 14px;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .hdr h1 { font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.15; }
+  .hdr h1 span { color: #fbbf24; }
+  .hdr-sub { font-size: 0.82rem; color: #888; margin-top: 0.4rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 100px; border: 1px solid rgba(255,255,255,.18); color: #aaa;
+  }
+
+  /* ── SEÇÃO ── */
+  .sec { margin-bottom: 3rem; }
+  .sec-title {
+    font-size: 1rem; font-weight: 700;
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
+    background: var(--ink); color: var(--bg);
+    padding: 3px 9px; border-radius: 5px;
+  }
+  .sec-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* ── CARD ── */
+  .card { background: var(--surf); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1rem; }
+  .card-hd {
+    background: var(--surf2); border-bottom: 1px solid var(--border);
+    padding: 0.55rem 1rem; font-size: 0.72rem; font-weight: 700; color: var(--muted);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot.r{background:var(--a1);} .dot.b{background:var(--a2);} .dot.g{background:var(--a3);} .dot.p{background:var(--a4);}
+
+  /* ── GRIDS ── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:680px){ .g2{ grid-template-columns:1fr; } }
+
+  /* ── CÓDIGO ── */
+  pre {
+    background: var(--code-bg); color: var(--code-fg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.755rem; line-height: 1.9;
+    padding: 1.1rem 1.25rem; overflow-x: auto;
+  }
+  .kw{color:#c792ea;} .at{color:#80cbc4;} .vl{color:#f9c859;}
+  .cm{color:#4d5b6b;font-style:italic;} .tg{color:#89ddff;}
+  .se{color:#f07178;} .pr{color:#82aaff;} .nu{color:#f78c6c;}
+  .fn{color:#c3e88d;} .hl{background:rgba(255,255,255,.07);display:block;margin:0 -1.25rem;padding:0 1.25rem;}
+
+  /* ── CALLOUT ── */
+  .call {
+    padding: 0.8rem 1rem 0.8rem 1.1rem;
+    border-radius: 8px; font-size: 0.82rem; margin-top: 0.75rem; border-left: 3px solid;
+  }
+  .call.warn { background:#fffbeb; border-color:#f59e0b; color:#78350f; }
+  .call.info { background:#eff6ff; border-color:#3b82f6; color:#1e3a8a; }
+  .call.good { background:#f0fdf4; border-color:#22c55e; color:#14532d; }
+  .call strong { font-weight: 700; }
+
+  /* ── TABELA ── */
+  table { width:100%; border-collapse:collapse; font-size:0.81rem; }
+  th {
+    text-align:left; padding:.5rem .9rem;
+    background:var(--surf2); color:var(--muted);
+    font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+    border-bottom:1px solid var(--border);
+  }
+  td { padding:.55rem .9rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  code {
+    font-family:'JetBrains Mono',monospace; font-size:0.74rem;
+    background:var(--surf2); padding:1px 6px; border-radius:4px; color:var(--a2);
+  }
+  .dim { color:var(--muted); font-size:.78rem; }
+
+  /* ══════════════════════════════
+     DEMOS VISUAIS DE FLEXBOX
+  ══════════════════════════════ */
+
+  /* caixa container dos demos */
+  .demo-wrap {
+    background: var(--surf2);
+    padding: 1rem;
+    border-radius: 0 0 10px 10px;
+  }
+  .demo-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; color: var(--muted);
+    padding: 0.4rem 1rem;
+    background: var(--surf2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* boxes coloridos dos demos */
+  .fb { background: var(--a2); color: #fff; font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:600; padding:0.5rem 0.9rem; border-radius:5px; }
+  .fb.b { background: var(--a2); }
+  .fb.g { background: var(--a3); }
+  .fb.r { background: var(--a1); }
+  .fb.p { background: var(--a4); }
+
+  /* ── Demos de justify-content ── */
+  .d-flex         { display:flex; gap:0.5rem; background:#e8f0ff; border-radius:7px; padding:0.6rem; }
+  .d-center       { justify-content:center; }
+  .d-end          { justify-content:flex-end; }
+  .d-between      { justify-content:space-between; }
+  .d-around       { justify-content:space-around; }
+  .d-col          { flex-direction:column; height:140px; }
+  .d-col-center   { flex-direction:column; justify-content:center; align-items:center; height:140px; }
+  .d-wrap         { flex-wrap:wrap; }
+  .d-align-start  { align-items:flex-start; height:90px; }
+  .d-align-center { align-items:center; height:90px; }
+  .d-align-end    { align-items:flex-end; height:90px; }
+  .d-align-stretch{ align-items:stretch; height:90px; }
+
+  /* grow demo */
+  .fb-grow1 { flex:1; }
+  .fb-grow2 { flex:2; }
+
+  /* ══════════════════════════════
+     DEMOS DE ANINHAMENTO
+  ══════════════════════════════ */
+
+  /* Camadas coloridas */
+  .L1 { background:var(--l1-bg); border:2px dashed var(--l1-bd); color:var(--l1-tx); }
+  .L2 { background:var(--l2-bg); border:2px dashed var(--l2-bd); color:var(--l2-tx); }
+  .L3 { background:var(--l3-bg); border:2px dashed var(--l3-bd); color:var(--l3-tx); }
+  .L4 { background:var(--l4-bg); border:2px dashed var(--l4-bd); color:var(--l4-tx); }
+  .L5 { background:var(--l5-bg); border:2px dashed var(--l5-bd); color:var(--l5-tx); }
+
+  .layer-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; font-weight: 600;
+    display: block; margin-bottom: 0.5rem;
+  }
+
+  /* ── Exemplo 1: Navbar aninhada ── */
+  .ex-navbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1.25rem; background: #1a1814; border-radius: 8px;
+  }
+  .ex-logo { color:#fbbf24; font-weight:700; font-size:0.95rem; }
+  .ex-nav-links { display:flex; gap:1.25rem; list-style:none; }
+  .ex-nav-links a { color:#ccc; text-decoration:none; font-size:0.82rem; }
+  .ex-nav-right { display:flex; gap:0.6rem; align-items:center; }
+  .ex-btn { padding:0.35rem 0.9rem; border-radius:6px; font-size:0.78rem; font-weight:700; cursor:pointer; border:none; }
+  .ex-btn.outline { background:transparent; border:1px solid #555; color:#ccc; }
+  .ex-btn.solid   { background:#fbbf24; color:#18160f; }
+
+  /* ── Exemplo 2: Hero section ── */
+  .ex-hero {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:2rem; padding:2rem; background:#18160f; border-radius:8px; flex-wrap:wrap;
+  }
+  .ex-hero-text { flex:1; min-width:200px; }
+  .ex-hero-text h2 { color:#fff; font-size:1.2rem; margin-bottom:0.4rem; }
+  .ex-hero-text p  { color:#999; font-size:0.82rem; margin-bottom:0.75rem; }
+  .ex-hero-btns { display:flex; gap:0.6rem; flex-wrap:wrap; }
+  .ex-hero-img {
+    flex:0 0 140px; height:100px;
+    background:#2a2722; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    color:#555; font-size:0.75rem;
+  }
+
+  /* ── Exemplo 3: Card de produto ── */
+  .ex-product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; }
+  @media(max-width:600px){ .ex-product-grid{ grid-template-columns:1fr; } }
+  .ex-product-card {
+    display:flex; flex-direction:column;
+    background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  }
+  .ex-product-img {
+    height:90px; background:var(--surf2);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:0.75rem;
+  }
+  .ex-product-body { padding:0.75rem; flex:1; display:flex; flex-direction:column; }
+  .ex-product-tag { font-size:0.62rem; font-weight:700; padding:2px 8px; border-radius:100px; background:#dbeafe; color:#1e3a8a; align-self:flex-start; margin-bottom:0.35rem; }
+  .ex-product-name { font-size:0.82rem; font-weight:700; color:var(--ink); margin-bottom:0.25rem; }
+  .ex-product-desc { font-size:0.72rem; color:var(--muted); flex:1; }
+  .ex-product-footer { display:flex; align-items:center; justify-content:space-between; margin-top:0.6rem; padding-top:0.6rem; border-top:1px solid var(--border); }
+  .ex-product-price { font-size:0.9rem; font-weight:700; color:var(--ink); }
+  .ex-product-btn { font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:6px; background:var(--ink); color:#fff; border:none; cursor:pointer; }
+
+  /* ── Exemplo 4: Dashboard layout ── */
+  .ex-dashboard { display:flex; flex-direction:column; gap:0.6rem; }
+  .ex-dash-header { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 1rem; background:var(--ink); border-radius:8px; }
+  .ex-dash-header span { color:#fff; font-weight:700; font-size:0.85rem; }
+  .ex-dash-header small { color:#888; font-size:0.72rem; }
+  .ex-dash-body { display:flex; gap:0.6rem; }
+  .ex-dash-sidebar { flex:0 0 120px; display:flex; flex-direction:column; gap:0.4rem; }
+  .ex-dash-nav-item { padding:0.45rem 0.7rem; background:var(--surf2); border-radius:6px; font-size:0.72rem; color:var(--muted); }
+  .ex-dash-nav-item.active { background:var(--ink); color:#fff; font-weight:700; }
+  .ex-dash-main { flex:1; display:flex; flex-direction:column; gap:0.6rem; }
+  .ex-dash-stats { display:flex; gap:0.5rem; }
+  .ex-stat { flex:1; background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.75rem; }
+  .ex-stat-label { font-size:0.65rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+  .ex-stat-value { font-size:1.1rem; font-weight:700; margin-top:2px; }
+  .ex-dash-content { background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:0.75rem; }
+  .ex-dash-content-title { font-size:0.78rem; font-weight:700; margin-bottom:0.5rem; }
+  .ex-dash-rows { display:flex; flex-direction:column; gap:0.35rem; }
+  .ex-dash-row { display:flex; align-items:center; gap:0.6rem; padding:0.35rem 0.5rem; background:var(--surf2); border-radius:5px; font-size:0.72rem; }
+  .ex-dash-row-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .ex-dash-row-name { flex:1; }
+  .ex-dash-row-val { font-weight:700; font-size:0.75rem; }
+
+  /* legenda camadas */
+  .legend { display:flex; flex-wrap:wrap; gap:0.5rem; padding:0.75rem 1rem; background:var(--surf2); border-top:1px solid var(--border); }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:0.7rem; }
+  .legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+  footer {
+    text-align:center; margin-top:3rem; padding-top:1.5rem;
+    border-top:1px solid var(--border); font-size:0.75rem; color:var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div>
+      <h1>Flexbox completo —<br><span>com divs aninhadas</span></h1>
+      <p class="hdr-sub">Do básico ao layout complexo · exemplos visuais + código</p>
+    </div>
+    <div class="chips">
+      <span class="chip">justify-content</span>
+      <span class="chip">align-items</span>
+      <span class="chip">flex-grow</span>
+      <span class="chip">aninhamento</span>
+      <span class="chip">layouts reais</span>
+    </div>
+  </header>
+
+
+  <!-- ══════════════════════════════════
+       01 — PROPRIEDADES DO CONTAINER
+  ══════════════════════════════════ -->
+  <section class="sec">
+    <h2 class="sec-title"><span class="num">01</span> Propriedades do container flex</h2>
+
+    <!-- justify-content -->
+    <div class="card">
+      <div class="card-hd"><span class="dot b"></span> justify-content — alinha no eixo principal (horizontal)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:1px solid var(--border);">
+
+        <div style="border-right:1px solid var(--border); border-bottom:1px solid var(--border);">
+          <div class="demo-label">flex-start (padrão)</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex" style="justify-content:flex-start;">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-bottom:1px solid var(--border);">
+          <div class="demo-label">center</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-center">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-right:1px solid var(--border); border-bottom:1px solid var(--border);">
+          <div class="demo-label">flex-end</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-end">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-bottom:1px solid var(--border);">
+          <div class="demo-label">space-between</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-between">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-right:1px solid var(--border);">
+          <div class="demo-label">space-around</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-around">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo-label">space-evenly</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex" style="justify-content:space-evenly;">
+              <div class="fb b">A</div><div class="fb g">B</div><div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <pre><span class="se">.container</span> { <span class="pr">display</span>:flex; }
+
+<span class="se">.container</span> { <span class="pr">justify-content</span>: flex-start; }   <span class="cm">/* ← items no início */</span>
+<span class="se">.container</span> { <span class="pr">justify-content</span>: center; }        <span class="cm">/* items no centro */</span>
+<span class="se">.container</span> { <span class="pr">justify-content</span>: flex-end; }     <span class="cm">/* items no final → */</span>
+<span class="hl"><span class="se">.container</span> { <span class="pr">justify-content</span>: space-between; } <span class="cm">/* primeiro | último | espaço igual entre */</span></span>
+<span class="se">.container</span> { <span class="pr">justify-content</span>: space-around; }  <span class="cm">/* espaço ao redor de cada item */</span>
+<span class="se">.container</span> { <span class="pr">justify-content</span>: space-evenly; }  <span class="cm">/* espaço igual em todo lugar */</span></pre>
+    </div>
+
+    <!-- align-items -->
+    <div class="card">
+      <div class="card-hd"><span class="dot g"></span> align-items — alinha no eixo cruzado (vertical)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0;">
+
+        <div style="border-right:1px solid var(--border);">
+          <div class="demo-label">flex-start</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-align-start">
+              <div class="fb b" style="height:30px;">A</div>
+              <div class="fb g" style="height:55px;">B</div>
+              <div class="fb r" style="height:40px;">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-right:1px solid var(--border);">
+          <div class="demo-label">center</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-align-center">
+              <div class="fb b" style="height:30px;">A</div>
+              <div class="fb g" style="height:55px;">B</div>
+              <div class="fb r" style="height:40px;">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-right:1px solid var(--border);">
+          <div class="demo-label">flex-end</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-align-end">
+              <div class="fb b" style="height:30px;">A</div>
+              <div class="fb g" style="height:55px;">B</div>
+              <div class="fb r" style="height:40px;">C</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo-label">stretch</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex d-align-stretch">
+              <div class="fb b">A</div>
+              <div class="fb g">B</div>
+              <div class="fb r">C</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <pre><span class="se">.container</span> { <span class="pr">display</span>:flex; <span class="pr">height</span>:<span class="nu">100px</span>; }
+
+<span class="se">.container</span> { <span class="pr">align-items</span>: flex-start; } <span class="cm">/* items colam no topo */</span>
+<span class="hl"><span class="se">.container</span> { <span class="pr">align-items</span>: center; }     <span class="cm">/* items no meio — o mais usado! */</span></span>
+<span class="se">.container</span> { <span class="pr">align-items</span>: flex-end; }   <span class="cm">/* items colam no fundo */</span>
+<span class="se">.container</span> { <span class="pr">align-items</span>: stretch; }    <span class="cm">/* items esticam até a altura do container */</span></pre>
+    </div>
+
+    <!-- flex-direction -->
+    <div class="card">
+      <div class="card-hd"><span class="dot r"></span> flex-direction — direção dos itens</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:1px solid var(--border);">
+        <div style="border-right:1px solid var(--border);">
+          <div class="demo-label">row (padrão) — horizontal</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex" style="flex-direction:row;">
+              <div class="fb b">1</div><div class="fb g">2</div><div class="fb r">3</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="demo-label">column — vertical</div>
+          <div style="padding:0.75rem; background:var(--surf2);">
+            <div class="d-flex" style="flex-direction:column; width:60px; gap:0.4rem;">
+              <div class="fb b">1</div><div class="fb g">2</div><div class="fb r">3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="se">.container</span> { <span class="pr">flex-direction</span>: row; }            <span class="cm">/* → itens em linha (padrão) */</span>
+<span class="se">.container</span> { <span class="pr">flex-direction</span>: column; }         <span class="cm">/* ↓ itens em coluna */</span>
+<span class="se">.container</span> { <span class="pr">flex-direction</span>: row-reverse; }    <span class="cm">/* ← linha invertida */</span>
+<span class="se">.container</span> { <span class="pr">flex-direction</span>: column-reverse; } <span class="cm">/* ↑ coluna invertida */</span>
+
+<span class="cm">/* ATENÇÃO: quando direction=column,
+   justify-content vira VERTICAL e align-items vira HORIZONTAL */</span></pre>
+    </div>
+
+    <!-- flex-grow -->
+    <div class="card">
+      <div class="card-hd"><span class="dot p"></span> flex-grow — quanto cada item cresce</div>
+      <div style="border-bottom:1px solid var(--border);">
+        <div class="demo-label">flex:1 em todos — crescem igual</div>
+        <div style="padding:0.75rem; background:var(--surf2);">
+          <div class="d-flex" style="gap:0.5rem;">
+            <div class="fb b" style="flex:1; text-align:center;">flex:1</div>
+            <div class="fb g" style="flex:1; text-align:center;">flex:1</div>
+            <div class="fb r" style="flex:1; text-align:center;">flex:1</div>
+          </div>
+        </div>
+        <div class="demo-label" style="border-top:1px solid var(--border);">flex:2 no meio — cresce o dobro</div>
+        <div style="padding:0.75rem; background:var(--surf2);">
+          <div class="d-flex" style="gap:0.5rem;">
+            <div class="fb b" style="flex:1; text-align:center;">flex:1</div>
+            <div class="fb g" style="flex:2; text-align:center;">flex:2 (dobro)</div>
+            <div class="fb r" style="flex:1; text-align:center;">flex:1</div>
+          </div>
+        </div>
+        <div class="demo-label" style="border-top:1px solid var(--border);">sidebar fixa + conteúdo que cresce</div>
+        <div style="padding:0.75rem; background:var(--surf2);">
+          <div class="d-flex" style="gap:0.5rem; align-items:stretch;">
+            <div class="fb p" style="flex:0 0 100px; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.65rem;">sidebar<br>flex:0 0 100px</div>
+            <div class="fb b" style="flex:1; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.65rem;">conteúdo — flex:1<br>(ocupa o resto)</div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="cm">/* flex: grow shrink basis */</span>
+<span class="se">.item</span>    { <span class="pr">flex</span>: <span class="nu">1</span>; }         <span class="cm">/* cresce igualmente */</span>
+<span class="se">.destaque</span>{ <span class="pr">flex</span>: <span class="nu">2</span>; }         <span class="cm">/* cresce o DOBRO dos flex:1 */</span>
+<span class="hl"><span class="se">.sidebar</span> { <span class="pr">flex</span>: <span class="nu">0 0 260px</span>; } <span class="cm">/* tamanho FIXO — não cresce nem encolhe */</span>
+<span class="se">.content</span> { <span class="pr">flex</span>: <span class="nu">1</span>; }          <span class="cm">/* ocupa TODO o espaço restante */</span></span>
+
+<span class="cm">/* margin-left: auto → empurra tudo que vem depois para a direita */</span>
+<span class="se">.navbar .logo</span> { <span class="pr">margin-right</span>: auto; } <span class="cm">/* links e btn vão para direita */</span></pre>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       02 — ANINHAMENTO: A LÓGICA
+  ══════════════════════════════════ -->
+  <section class="sec">
+    <h2 class="sec-title"><span class="num">02</span> A lógica do aninhamento</h2>
+
+    <div class="call info" style="margin-bottom:1rem;">
+      <strong>Regra fundamental:</strong> qualquer elemento pode ser <em>ao mesmo tempo</em> um <strong>item flex</strong> (filho) e um <strong>container flex</strong> (pai). É assim que funciona o aninhamento — cada camada tem seu próprio <code>display: flex</code> independente.
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="dot b"></span> Cada camada tem seu próprio flex — visualização</div>
+      <div style="padding:1.25rem;">
+
+        <!-- Camada 1 -->
+        <div class="L1" style="padding:12px; border-radius:10px;">
+          <span class="layer-label">Camada 1 — .page (display:flex, flex-direction:column)</span>
+
+          <!-- Camada 2a: header -->
+          <div class="L2" style="padding:10px; border-radius:8px; margin-bottom:8px;">
+            <span class="layer-label">Camada 2 — header (display:flex, justify-content:space-between)</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+              <div class="L3" style="padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Logo</div>
+              <!-- Camada 3: nav-links -->
+              <div class="L3" style="padding:6px; border-radius:6px;">
+                <span class="layer-label" style="font-size:0.6rem;">Camada 3 — nav-links (display:flex, gap)</span>
+                <div style="display:flex; gap:0.6rem;">
+                  <div class="L4" style="padding:4px 8px; border-radius:4px; font-size:0.7rem;">Início</div>
+                  <div class="L4" style="padding:4px 8px; border-radius:4px; font-size:0.7rem;">Sobre</div>
+                  <div class="L4" style="padding:4px 8px; border-radius:4px; font-size:0.7rem;">Contato</div>
+                </div>
+              </div>
+              <div class="L3" style="padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Entrar</div>
+            </div>
+          </div>
+
+          <!-- Camada 2b: main (cards) -->
+          <div class="L2" style="padding:10px; border-radius:8px;">
+            <span class="layer-label">Camada 2 — main (display:grid, 3 colunas)</span>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+
+              <!-- Card 1 -->
+              <div class="L3" style="padding:8px; border-radius:8px;">
+                <span class="layer-label" style="font-size:0.6rem;">Camada 3 — .card (display:flex, column)</span>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                  <div class="L4" style="padding:4px 6px; border-radius:4px; font-size:0.68rem;">imagem</div>
+                  <div class="L4" style="padding:6px; border-radius:4px;">
+                    <span class="layer-label" style="font-size:0.58rem;">Camada 4 — .card-body</span>
+                    <div class="L5" style="padding:3px 6px; border-radius:3px; font-size:0.62rem; display:inline-block; margin-bottom:3px;">tag</div>
+                    <div class="L5" style="padding:3px 6px; border-radius:3px; font-size:0.62rem; display:block; margin-bottom:2px;">h3</div>
+                    <div class="L5" style="padding:3px 6px; border-radius:3px; font-size:0.62rem; display:block;">p</div>
+                  </div>
+                  <!-- footer do card -->
+                  <div class="L4" style="padding:4px 6px; border-radius:4px;">
+                    <span class="layer-label" style="font-size:0.58rem;">Camada 4 — .card-footer (display:flex, space-between)</span>
+                    <div style="display:flex; justify-content:space-between;">
+                      <div class="L5" style="padding:2px 5px; border-radius:3px; font-size:0.6rem;">autor</div>
+                      <div class="L5" style="padding:2px 5px; border-radius:3px; font-size:0.6rem;">data</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2 e 3: simplificados -->
+              <div class="L3" style="padding:8px; border-radius:8px; display:flex; flex-direction:column; gap:5px; align-items:center; justify-content:center;">
+                <span style="font-size:0.65rem; opacity:.6;">.card (igual)</span>
+              </div>
+              <div class="L3" style="padding:8px; border-radius:8px; display:flex; flex-direction:column; gap:5px; align-items:center; justify-content:center;">
+                <span style="font-size:0.65rem; opacity:.6;">.card (igual)</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--l1-bg);border:2px solid var(--l1-bd);"></div><span style="color:var(--l1-tx);">Camada 1 — .page</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--l2-bg);border:2px solid var(--l2-bd);"></div><span style="color:var(--l2-tx);">Camada 2 — header / main</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--l3-bg);border:2px solid var(--l3-bd);"></div><span style="color:var(--l3-tx);">Camada 3 — .card / nav-links</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--l4-bg);border:2px solid var(--l4-bd);"></div><span style="color:var(--l4-tx);">Camada 4 — .card-body / .card-footer</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--l5-bg);border:2px solid var(--l5-bd);"></div><span style="color:var(--l5-tx);">Camada 5 — tag, h3, p, spans</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       03 — EXEMPLOS REAIS COMPLETOS
+  ══════════════════════════════════ -->
+  <section class="sec">
+    <h2 class="sec-title"><span class="num">03</span> Exemplos reais completos</h2>
+
+    <!-- EXEMPLO 1: NAVBAR -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-hd"><span class="dot b"></span> Exemplo 1 — Navbar com 3 grupos aninhados</div>
+      <div style="padding:1rem; background:var(--surf2); border-bottom:1px solid var(--border);">
+        <ex class="ex-navbar">
+          <div class="ex-logo">⚡ DevSite</div>
+          <ul class="ex-nav-links">
+            <li><a href="#">Início</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Docs</a></li>
+          </ul>
+          <div class="ex-nav-right">
+            <button class="ex-btn outline">Login</button>
+            <button class="ex-btn solid">Começar</button>
+          </div>
+        </ex>
+      </div>
+      <pre><span class="cm">&lt;!-- HTML: 3 níveis de flex --&gt;</span>
+<span class="tg">&lt;nav</span> <span class="at">class</span>=<span class="vl">"navbar"</span><span class="tg">&gt;</span>                        <span class="cm">&lt;!-- flex container 1 --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"logo"</span><span class="tg">&gt;</span>DevSite<span class="tg">&lt;/div&gt;</span>           <span class="cm">&lt;!-- item 1 --&gt;</span>
+  <span class="tg">&lt;ul</span> <span class="at">class</span>=<span class="vl">"nav-links"</span><span class="tg">&gt;</span>                  <span class="cm">&lt;!-- item 2 E flex container 2 --&gt;</span>
+    <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Início<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="vl">"#"</span><span class="tg">&gt;</span>Blog<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="tg">&lt;/ul&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"nav-right"</span><span class="tg">&gt;</span>                  <span class="cm">&lt;!-- item 3 E flex container 3 --&gt;</span>
+    <span class="tg">&lt;button&gt;</span>Login<span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;button&gt;</span>Começar<span class="tg">&lt;/button&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/nav&gt;</span>
+
+<span class="cm">/* CSS */</span>
+<span class="hl"><span class="se">.navbar</span> {                               <span class="cm">/* container 1 */</span>
+  <span class="pr">display</span>: flex;
+  <span class="pr">align-items</span>: center;
+  <span class="pr">justify-content</span>: space-between;       <span class="cm">/* logo | links | botões */</span>
+  <span class="pr">padding</span>: <span class="nu">1rem</span> <span class="nu">2rem</span>; <span class="pr">background</span>: <span class="vl">#111</span>;
+}</span>
+<span class="se">.nav-links</span> {                            <span class="cm">/* container 2 — dentro do container 1 */</span>
+  <span class="pr">display</span>: flex; <span class="pr">gap</span>: <span class="nu">1.5rem</span>; <span class="pr">list-style</span>: none;
+}
+<span class="se">.nav-right</span> {                            <span class="cm">/* container 3 — dentro do container 1 */</span>
+  <span class="pr">display</span>: flex; <span class="pr">gap</span>: <span class="nu">0.5rem</span>; <span class="pr">align-items</span>: center;
+}</pre>
+    </div>
+
+    <!-- EXEMPLO 2: HERO -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-hd"><span class="dot r"></span> Exemplo 2 — Hero section (texto + imagem lado a lado)</div>
+      <div style="padding:1rem; background:var(--surf2); border-bottom:1px solid var(--border);">
+        <div class="ex-hero">
+          <div class="ex-hero-text">
+            <h2>Aprenda a programar</h2>
+            <p>Cursos práticos para você evoluir do zero ao avançado rapidamente.</p>
+            <div class="ex-hero-btns">
+              <button class="ex-btn solid" style="background:#fbbf24;color:#18160f;">Começar grátis</button>
+              <button class="ex-btn outline" style="border-color:#555;color:#ccc;">Ver cursos</button>
+            </div>
+          </div>
+          <div class="ex-hero-img">[ imagem ]</div>
+        </div>
+      </div>
+      <pre><span class="cm">&lt;!-- HTML --&gt;</span>
+<span class="tg">&lt;section</span> <span class="at">class</span>=<span class="vl">"hero"</span><span class="tg">&gt;</span>                      <span class="cm">&lt;!-- flex container 1 --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"hero-text"</span><span class="tg">&gt;</span>                   <span class="cm">&lt;!-- item 1 E flex container 2 --&gt;</span>
+    <span class="tg">&lt;h1&gt;</span>Aprenda a programar<span class="tg">&lt;/h1&gt;</span>
+    <span class="tg">&lt;p&gt;</span>Cursos práticos...<span class="tg">&lt;/p&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"hero-btns"</span><span class="tg">&gt;</span>                <span class="cm">&lt;!-- flex container 3 --&gt;</span>
+      <span class="tg">&lt;button&gt;</span>Começar<span class="tg">&lt;/button&gt;</span>
+      <span class="tg">&lt;button&gt;</span>Ver cursos<span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;img</span> <span class="at">src</span>=<span class="vl">"hero.jpg"</span> <span class="at">alt</span>=<span class="vl">"..."</span><span class="tg">&gt;</span>            <span class="cm">&lt;!-- item 2 --&gt;</span>
+<span class="tg">&lt;/section&gt;</span>
+
+<span class="cm">/* CSS */</span>
+<span class="hl"><span class="se">.hero</span> {                       <span class="cm">/* container 1: lado a lado */</span>
+  <span class="pr">display</span>: flex;
+  <span class="pr">align-items</span>: center;
+  <span class="pr">justify-content</span>: space-between;
+  <span class="pr">gap</span>: <span class="nu">3rem</span>; <span class="pr">padding</span>: <span class="nu">4rem</span> <span class="nu">2rem</span>;
+  <span class="pr">flex-wrap</span>: wrap;              <span class="cm">/* no mobile empilha */</span>
+}</span>
+<span class="se">.hero-text</span> {                   <span class="cm">/* container 2: coluna */</span>
+  <span class="pr">display</span>: flex; <span class="pr">flex-direction</span>: column; <span class="pr">gap</span>: <span class="nu">1rem</span>;
+  <span class="pr">flex</span>: <span class="nu">1</span>; <span class="pr">min-width</span>: <span class="nu">280px</span>;
+}
+<span class="se">.hero-btns</span> {                   <span class="cm">/* container 3: botões lado a lado */</span>
+  <span class="pr">display</span>: flex; <span class="pr">gap</span>: <span class="nu">1rem</span>; <span class="pr">flex-wrap</span>: wrap;
+}
+<span class="se">.hero img</span> {                    <span class="cm">/* item 2: tamanho fixo */</span>
+  <span class="pr">flex</span>: <span class="nu">0 0 400px</span>; <span class="pr">border-radius</span>: <span class="nu">12px</span>;
+}</pre>
+    </div>
+
+    <!-- EXEMPLO 3: CARDS DE PRODUTO -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-hd"><span class="dot g"></span> Exemplo 3 — Grade de cards (flex dentro de flex dentro de flex)</div>
+      <div style="padding:1rem; background:var(--surf2); border-bottom:1px solid var(--border);">
+        <div class="ex-product-grid">
+          <div class="ex-product-card">
+            <div class="ex-product-img">📦 imagem</div>
+            <div class="ex-product-body">
+              <span class="ex-product-tag">Eletrônicos</span>
+              <div class="ex-product-name">Fone Bluetooth Pro</div>
+              <div class="ex-product-desc">Som imersivo com cancelamento de ruído ativo.</div>
+              <div class="ex-product-footer">
+                <span class="ex-product-price">R$ 349</span>
+                <button class="ex-product-btn">Comprar</button>
+              </div>
+            </div>
+          </div>
+          <div class="ex-product-card">
+            <div class="ex-product-img">📦 imagem</div>
+            <div class="ex-product-body">
+              <span class="ex-product-tag">Casa</span>
+              <div class="ex-product-name">Luminária LED</div>
+              <div class="ex-product-desc">Design moderno, luz regulável em 3 tons.</div>
+              <div class="ex-product-footer">
+                <span class="ex-product-price">R$ 129</span>
+                <button class="ex-product-btn">Comprar</button>
+              </div>
+            </div>
+          </div>
+          <div class="ex-product-card">
+            <div class="ex-product-img">📦 imagem</div>
+            <div class="ex-product-body">
+              <span class="ex-product-tag">Esporte</span>
+              <div class="ex-product-name">Squeeze Térmica</div>
+              <div class="ex-product-desc">Mantém sua bebida gelada por até 24 horas.</div>
+              <div class="ex-product-footer">
+                <span class="ex-product-price">R$ 89</span>
+                <button class="ex-product-btn">Comprar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="cm">/* O segredo: .card-body é flex coluna com flex:1
+   isso faz todos os cards terem a mesma altura! */</span>
+
+<span class="se">.cards-grid</span> {
+  <span class="pr">display</span>: grid;
+  <span class="pr">grid-template-columns</span>: repeat(<span class="nu">3</span>, <span class="nu">1fr</span>);
+  <span class="pr">gap</span>: <span class="nu">1.5rem</span>;
+}
+<span class="hl"><span class="se">.card</span> {                          <span class="cm">/* container flex coluna */</span>
+  <span class="pr">display</span>: flex;
+  <span class="pr">flex-direction</span>: column;         <span class="cm">/* empilha imagem + body */</span>
+  <span class="pr">border-radius</span>: <span class="nu">12px</span>; <span class="pr">overflow</span>: hidden;
+}</span>
+<span class="se">.card-body</span> {                     <span class="cm">/* container flex coluna aninhado */</span>
+  <span class="pr">display</span>: flex;
+  <span class="pr">flex-direction</span>: column;
+  <span class="hl">  <span class="pr">flex</span>: <span class="nu">1</span>;                        <span class="cm">/* cresce para preencher — iguala altura dos cards! */</span></span>
+  <span class="pr">padding</span>: <span class="nu">1rem</span>;
+}
+<span class="se">.card-footer</span> {                   <span class="cm">/* container flex linha aninhado */</span>
+  <span class="pr">display</span>: flex;
+  <span class="pr">justify-content</span>: space-between;
+  <span class="pr">align-items</span>: center;
+  <span class="hl">  <span class="pr">margin-top</span>: auto;               <span class="cm">/* empurra para o fundo do card */</span></span>
+  <span class="pr">padding-top</span>: <span class="nu">0.75rem</span>;
+  <span class="pr">border-top</span>: <span class="nu">1px</span> solid <span class="vl">#eee</span>;
+}</pre>
+    </div>
+
+    <!-- EXEMPLO 4: DASHBOARD -->
+    <div class="card">
+      <div class="card-hd"><span class="dot p"></span> Exemplo 4 — Dashboard (layout mais complexo)</div>
+      <div style="padding:1rem; background:var(--surf2); border-bottom:1px solid var(--border);">
+        <div class="ex-dashboard">
+          <div class="ex-dash-header">
+            <span>Dashboard</span>
+            <small>Bem-vindo de volta</small>
+          </div>
+          <div class="ex-dash-body">
+            <div class="ex-dash-sidebar">
+              <div class="ex-dash-nav-item active">📊 Resumo</div>
+              <div class="ex-dash-nav-item">👥 Usuários</div>
+              <div class="ex-dash-nav-item">💰 Vendas</div>
+              <div class="ex-dash-nav-item">⚙️ Config</div>
+            </div>
+            <div class="ex-dash-main">
+              <div class="ex-dash-stats">
+                <div class="ex-stat"><div class="ex-stat-label">Visitas</div><div class="ex-stat-value">12.4k</div></div>
+                <div class="ex-stat"><div class="ex-stat-label">Vendas</div><div class="ex-stat-value">R$ 8.2k</div></div>
+                <div class="ex-stat"><div class="ex-stat-label">Clientes</div><div class="ex-stat-value">342</div></div>
+              </div>
+              <div class="ex-dash-content">
+                <div class="ex-dash-content-title">Últimas vendas</div>
+                <div class="ex-dash-rows">
+                  <div class="ex-dash-row"><div class="ex-dash-row-dot" style="background:var(--a3)"></div><span class="ex-dash-row-name">Fone Bluetooth</span><span class="ex-dash-row-val">R$ 349</span></div>
+                  <div class="ex-dash-row"><div class="ex-dash-row-dot" style="background:var(--a2)"></div><span class="ex-dash-row-name">Luminária LED</span><span class="ex-dash-row-val">R$ 129</span></div>
+                  <div class="ex-dash-row"><div class="ex-dash-row-dot" style="background:var(--a1)"></div><span class="ex-dash-row-name">Squeeze Térmica</span><span class="ex-dash-row-val">R$ 89</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="cm">&lt;!-- HTML: 5 níveis de flex --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"dashboard"</span><span class="tg">&gt;</span>             <span class="cm">&lt;!-- flex coluna (header em cima, body embaixo) --&gt;</span>
+  <span class="tg">&lt;header</span> <span class="at">class</span>=<span class="vl">"dash-header"</span><span class="tg">&gt;</span>      <span class="cm">&lt;!-- flex linha (título | info) --&gt;</span>
+    <span class="tg">&lt;span&gt;</span>Dashboard<span class="tg">&lt;/span&gt;</span>
+    <span class="tg">&lt;small&gt;</span>Bem-vindo<span class="tg">&lt;/small&gt;</span>
+  <span class="tg">&lt;/header&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"dash-body"</span><span class="tg">&gt;</span>           <span class="cm">&lt;!-- flex linha (sidebar | main) --&gt;</span>
+    <span class="tg">&lt;aside</span> <span class="at">class</span>=<span class="vl">"sidebar"</span><span class="tg">&gt;</span><span class="tg">&lt;/aside&gt;</span>
+    <span class="tg">&lt;main</span> <span class="at">class</span>=<span class="vl">"dash-main"</span><span class="tg">&gt;</span>         <span class="cm">&lt;!-- flex coluna (stats + conteúdo) --&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"stats"</span><span class="tg">&gt;</span>           <span class="cm">&lt;!-- flex linha (3 cards de stat) --&gt;</span>
+        <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"stat"</span><span class="tg">&gt;</span>...<span class="tg">&lt;/div&gt;</span>
+      <span class="tg">&lt;/div&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="vl">"content"</span><span class="tg">&gt;</span>...<span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;/main&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span>
+
+<span class="cm">/* CSS */</span>
+<span class="hl"><span class="se">.dashboard</span>  { <span class="pr">display</span>:flex; <span class="pr">flex-direction</span>:column; <span class="pr">gap</span>:<span class="nu">1rem</span>; }
+<span class="se">.dash-header</span>{ <span class="pr">display</span>:flex; <span class="pr">justify-content</span>:space-between; <span class="pr">align-items</span>:center; }
+<span class="se">.dash-body</span>  { <span class="pr">display</span>:flex; <span class="pr">gap</span>:<span class="nu">1.5rem</span>; }
+<span class="se">.sidebar</span>    { <span class="pr">flex</span>:<span class="nu">0 0 220px</span>; }      <span class="cm">/* largura fixa */</span>
+<span class="se">.dash-main</span>  { <span class="pr">flex</span>:<span class="nu">1</span>; <span class="pr">display</span>:flex; <span class="pr">flex-direction</span>:column; <span class="pr">gap</span>:<span class="nu">1rem</span>; }
+<span class="se">.stats</span>      { <span class="pr">display</span>:flex; <span class="pr">gap</span>:<span class="nu">1rem</span>; }</span>
+<span class="se">.stat</span>       { <span class="pr">flex</span>:<span class="nu">1</span>; } <span class="cm">/* cada stat ocupa espaço igual */</span></pre>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       04 — REFERÊNCIA RÁPIDA
+  ══════════════════════════════════ -->
+  <section class="sec">
+    <h2 class="sec-title"><span class="num">04</span> Referência rápida — o que usar em cada situação</h2>
+    <div class="card">
+      <div class="card-hd"><span class="dot b"></span> Tabela de decisão rápida</div>
+      <table>
+        <thead><tr><th>Situação na prova</th><th>Código exato</th></tr></thead>
+        <tbody>
+          <tr><td>Navbar: logo à esquerda, links à direita</td><td><code>.navbar { display:flex; justify-content:space-between; align-items:center; }</code></td></tr>
+          <tr><td>Botões lado a lado dentro da navbar</td><td><code>.nav-right { display:flex; gap:0.5rem; }</code></td></tr>
+          <tr><td>Centralizar algo na tela inteira</td><td><code>.hero { display:flex; justify-content:center; align-items:center; min-height:100vh; }</code></td></tr>
+          <tr><td>Sidebar fixa + conteúdo que preenche o resto</td><td><code>.sidebar { flex:0 0 260px; } .content { flex:1; }</code></td></tr>
+          <tr><td>Cards com altura igual (footer sempre no fundo)</td><td><code>.card { display:flex; flex-direction:column; } .card-body { flex:1; }</code></td></tr>
+          <tr><td>Footer sempre colado no fundo do card</td><td><code>.card-footer { margin-top:auto; }</code></td></tr>
+          <tr><td>Preço à esquerda, botão à direita</td><td><code>.card-footer { display:flex; justify-content:space-between; align-items:center; }</code></td></tr>
+          <tr><td>Empilhar itens verticalmente com espaço</td><td><code>.card-body { display:flex; flex-direction:column; gap:0.75rem; }</code></td></tr>
+          <tr><td>Rodapé sempre no fundo da página</td><td><code>body { display:flex; flex-direction:column; min-height:100vh; } main { flex:1; }</code></td></tr>
+          <tr><td>Quebrar em linha nova se não couber</td><td><code>.container { display:flex; flex-wrap:wrap; gap:1rem; }</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="call warn">
+      <strong>Mantra de prova:</strong> Toda vez que você quiser colocar dois elementos <em>lado a lado</em>, o pai deles precisa de <code>display: flex</code>. Toda vez que quiser <em>empilhar</em> coisas em coluna com controle, use <code>flex-direction: column</code>. O filho que precisa ocupar o espaço restante recebe <code>flex: 1</code>.
+    </div>
+  </section>
+
+  <footer>
+    Flexbox completo com divs aninhadas &nbsp;·&nbsp; Ciência de Dados & IA &nbsp;·&nbsp; 2025
+  </footer>
+
+</div>
+</body>
+</html>
